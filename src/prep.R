@@ -68,15 +68,17 @@ tic_generate <- function(inputsequence) {
       last_node <- list()
       
       for(pp in 1:nrow(inputsequence)){
-        tags <- unlist(strsplit(as.character(inputsequence[which(inputsequence[,1]== pp),2]), split=", "))
-        nodes <- rbind(nodes, c(inputsequence[which(inputsequence[,1]== pp),1],as.character(inputsequence[which(inputsequence[,1]== pp),2]),inputsequence[which(inputsequence[,1]== pp),1]))
+        tags <- unlist(strsplit(as.character(inputsequence[which(inputsequence[,1] == pp),2]), split=", "))
+        nodes <- rbind(nodes, c(inputsequence[which(inputsequence[,1]== pp),1],
+                                as.character(inputsequence[which(inputsequence[,1] == pp),2]),
+                                inputsequence[which(inputsequence[,1] == pp),1]))
         
         for(jj in 1:length(tags)){
           cur_tag <- tags[jj]
           if(!is.null(unlist(last_node[cur_tag]))){ 
             source_node <- last_node[cur_tag]
             target_node <- pp
-            links <- rbind(links, c(source_node, target_node,cur_tag))
+            links <- rbind(links, c(source_node, target_node, cur_tag))
           } else {
             roots <- rbind(roots, c(pp, cur_tag))
           }
@@ -116,12 +118,12 @@ for(sliceSize in slice_sizes){
     #split by number of words and chapters
     full_text <- strsplit(processedText, "(?i:Chapter [0-9A-Z]+[\\.]?[\\s.]?)", perl=T)[[1]]
     words300B <- c()
-    tmp <- sapply(full_text,function(x){
+    tmp <- sapply(full_text, function(x){
       snippet <- strsplit(x, "\\s+")[[1]]
-      if(length(snippet>1)){
-        groupA <- rep(seq(ceiling(length(snippet)/sliceSize)), each=sliceSize)[1:length(snippet)]
+      if(length(snippet > 1)){
+        groupA <- rep(seq(ceiling(length(snippet) / sliceSize)), each = sliceSize)[1:length(snippet)]
         words300A <- split(snippet, groupA)
-        words300B <- c(words300B,words300A)
+        words300B <- c(words300B, words300A)
       }
     })
     
@@ -162,24 +164,25 @@ for(sliceSize in slice_sizes){
       
       charDS <- data.frame(x = numeric(), y = character(), stringsAsFactors = FALSE)
       for(i in 1:length(words300A)){
-        s<-as.String(paste(unlist(words300A[i]),collapse=' '))
+        s<-as.String(paste(unlist(words300A[i]), collapse=' '))
         
         a2 <- NLP::annotate(s, list(sent_token_annotator, word_token_annotator))
         a3 <- NLP::annotate(s, pos_tag_annotator, a2)
         a3w <- subset(a3, type == "word")
         tags <- sapply(a3w$features, `[[`, "POS")
-        nNouns<-length(which(tags=='NN' | tags=='NNS'))
+        nNouns<-length(which(tags == 'NN' | tags == 'NNS'))
         nTags <- length(tags)
-        nounsOnly <-s[a3w][which(tags=='NN' | tags=='NNS')]
-        matrix <- create_matrix(nounsOnly, stemWords=TRUE, removeStopwords=TRUE, minWordLength=3)
-        charDS <- rbind(charDS,data.frame(i,paste(unique(colnames(matrix)),collapse=', ')),stringsAsFactors=F)
+        nounsOnly <-s[a3w][which(tags == 'NN' | tags == 'NNS')]
+        matrix <- create_matrix(nounsOnly, stemWords = TRUE,
+                                removeStopwords = TRUE, minWordLength = 3)
+        charDS <- rbind(charDS,data.frame(i,paste(unique(colnames(matrix)),collapse = ', ')), stringsAsFactors = F)
       }
     } else if(method == "ngram"){
       nGramTokenizer <- function(x) NGramTokenizer(x, Weka_control(min = 3, max = 3))
       
       charDS <- data.frame(x = numeric(), y = character(), stringsAsFactors = FALSE)
       for(i in 1:length(words300A)){
-        a <- VCorpus(VectorSource(c(as.String(paste(unlist(words300A[i]),collapse=' ')))))
+        a <- VCorpus(VectorSource(c(as.String(paste(unlist(words300A[i]), collapse=' ')))))
         a <- tm_map(a, removeNumbers)
         a <- tm_map(a, removePunctuation)
         a <- tm_map(a , stripWhitespace)
@@ -190,28 +193,28 @@ for(sliceSize in slice_sizes){
         tdm <- TermDocumentMatrix(a, control = list(tokenize = nGramTokenizer))
         #tdm <- removeSparseTerms(tdm, 0.75)
         
-        charDS <- rbind(charDS,data.frame(i,paste(unique(tdm$dimnames$Terms),collapse=', ')),stringsAsFactors=F)
+        charDS <- rbind(charDS, data.frame(i,paste(unique(tdm$dimnames$Terms), collapse=', ')),stringsAsFactors=F)
       }
     }
     
     tic <- tic_generate(charDS)
     
-    nodes <- data.frame(node_id = unlist(tic[[1]][,1]),tags = unlist(tic[[1]][,2]),
-                        dpub = unlist(tic[[1]][,3]),stringsAsFactors = F)
-    links <- data.frame(source = unlist(tic[[2]][,1]),target = unlist(tic[[2]][,2]),
-                        tag = unlist(tic[[2]][,3]),stringsAsFactors = F)
+    nodes <- data.frame(node_id = unlist(tic[[1]][,1]), tags = unlist(tic[[1]][,2]),
+                        dpub = unlist(tic[[1]][,3]), stringsAsFactors = F)
+    links <- data.frame(source = unlist(tic[[2]][,1]), target = unlist(tic[[2]][,2]),
+                        tag = unlist(tic[[2]][,3]), stringsAsFactors = F)
     roots <- data.frame(root_node_id = unlist(tic[[3]][,1]),
-                        tag = unlist(tic[[3]][,2]),stringsAsFactors = F)
-
-    write.table(nodes,file=paste0("TLit/www/output/",sliceSize,"/",theSource,"_nodes.csv"))
-    write.table(links,file=paste0("TLit/www/output/",sliceSize,"/",theSource,"_links.csv"))
-    write.table(roots,file=paste0("TLit/www/output/",sliceSize,"/",theSource,"_roots.csv"))
+                        tag = unlist(tic[[3]][,2]), stringsAsFactors = F)
+## Can we replace this with a lapply call for a list, saves two lines
+    write.table(nodes,file=paste0("TLit/www/output/", sliceSize,"/", theSource,"_nodes.csv"), row.names = F)
+    write.table(links,file=paste0("TLit/www/output/", sliceSize,"/", theSource,"_links.csv"), row.names = F)
+    write.table(roots,file=paste0("TLit/www/output/", sliceSize,"/", theSource,"_roots.csv"), row.names = F)
     
-    linksDelta <- as.integer(links$target)-as.integer(links$source)
-    jpeg(paste0("TLit/www/output/",sliceSize,"/",theSource,"_links_delta.jpg"))
-    plot(linksDelta,type='l')
-    abline(h=mean(linksDelta),col="red")
-    abline(h=median(linksDelta),col="blue")
+    linksDelta <- as.integer(links$target) - as.integer(links$source)
+    jpeg(paste0("TLit/www/output/", sliceSize, "/", theSource, "_links_delta.jpg"))
+    plot(linksDelta, type='l')
+    abline(h=mean(linksDelta), col="red")
+    abline(h=median(linksDelta), col="blue")
     dev.off()
     
     linksDelta.count <- count(linksDelta)
@@ -318,8 +321,8 @@ for(sliceSize in slice_sizes){
     degd <- degree.distribution(g)
     wtc <- cluster_walktrap(g)
     gstat <- c(diameter(g),min(degd),max(degd),mean(degd),edge_density(g),modularity(wtc))
-    write.table(c(theSource,gstat),paste0("TLit/www/output/",sliceSize,"/",theSource,"_netstat_combined.csv"),append = T,col.names = F,row.names = F)
-    write.csv2(gstat,paste("TLit/www/output/",sliceSize,"/",theSource,"_netstat.csv",sep=''),col.names = F,row.names = F)
+    write.table(c(theSource,gstat),paste0("TLit/www/output/",sliceSize,"/",theSource,"_netstat_combined.csv"), append = T, col.names = F, row.names = F)
+    write.csv2(gstat,paste("TLit/www/output/",sliceSize,"/",theSource,"_netstat.csv",sep=''), col.names = F, row.names = F)
     
     nodes <- as.data.frame(nodes,stringsAsFactors=F)
     colnames(nodes) <- c('id','title','label')
@@ -349,35 +352,6 @@ for(sliceSize in slice_sizes){
     
     #### create the character network from the cascade
     socN1 <- c()
-    for(lin in 1:nrow(nodes)){
-      nex <- unlist(strsplit(nodes$title[lin],", "))
-      if(length(nex)>1) socN1 <- rbind(socN1,paste(nex,collapse=', '))
-      
-      if(lin%%(round(nrow(nodes)/10)) == 0){
-        socEdges<-c()
-        for(lin in 1:length(socN1)){
-          
-          socEdges<-rbind(socEdges,combinations(length(unlist(strsplit(socN1[lin],', '))),2,unlist(strsplit(socN1[lin],', '))))
-        }
-        
-        h <- graph.data.frame(unique(socEdges),directed=FALSE)
-        V(h)$frame.color <- "white"
-        V(h)$color <- "orange"
-        
-        E(h)$width <- 0.1
-        
-        lay <- layout_with_dh(h)
-        lay <- norm_coords(lay, ymin=-1, ymax=1, xmin=-1, xmax=1)
-        minC <- rep(-Inf, vcount(h))
-        maxC <- rep(Inf, vcount(h))
-        minC[1] <- maxC[1] <- 0
-        co <- layout_with_fr(h, minx=minC, maxx=maxC,
-                             miny=minC, maxy=maxC)
-        pdf(paste0("TLit/www/output/",sliceSize,"/",theSource,"_gutenberg_dh_socnet_",lin,".pdf"))
-        plot(h, layout=co, vertex.size=2,vertex.label.cex=0.2,edge.label.cex=0.2, edge.arrow.size=0.1, rescale=TRUE,vertex.label.dist=0)
-        dev.off()
-      }
-    }
     socEdges<-c()
     for(lin in 1:length(socN1)){
       
@@ -470,14 +444,14 @@ for(sliceSize in slice_sizes){
     plot( x=0:max(deg), y=1-deg.dist, pch=19, cex=1.2, col="orange", xlab="Degree", ylab="Cumulative Frequency")
     dev.off()
     
-    write.table(socEdges,file=paste0("TLit/www/output/",sliceSize,"/",theSource,"_socialnetwork_links.csv"))
+    write.table(socEdges,file=paste0("TLit/www/output/",sliceSize,"/",theSource,"_socialnetwork_links.csv"), row.names = F)
     
   
     #stats for the social graph
     degd <- degree.distribution(h)
     wtc <- cluster_walktrap(h)
     gstat <- c(diameter(h),min(degd),max(degd),mean(degd),edge_density(h),modularity(wtc))
-    write.table(c(theSource,gstat),paste0("TLit/www/output/",sliceSize,"/",theSource,"_socnetstat_combined.csv"),append = T,col.names = F,row.names = F)
+    write.table(c(theSource,gstat),paste0("TLit/www/output/",sliceSize,"/",theSource,"_socnetstat_combined.csv"), append = T, col.names = F, row.names = F)
     write.csv2(gstat,paste("TLit/www/output/",sliceSize,"/",theSource,"_socnetstat.csv",sep=''),col.names = F,row.names = F)
     
     ####
@@ -589,7 +563,7 @@ for(sliceSize in slice_sizes){
     scatterplot3d(coordinates[,2],coordinates[,1],coordinates[,3],pch=16, highlight.3d=TRUE,type="h",xlab="Specificity",ylab="Node index",zlab="Diversity")
     dev.off()
     
-    write.table(cbind(coordinates,wien,struct),file=paste0("TLit/www/output/",sliceSize,"/",theSource,"_temporal_statistics.csv"),row.names = F)
+    write.table(cbind(coordinates,wien,struct),file=paste0("TLit/www/output/",sliceSize,"/",theSource,"_temporal_statistics.csv"), row.names = F)
     
     write.csv(ent,file=paste("TLit/www/output/",sliceSize,"/",theSource,"_gutenberg_entropy.txt",sep=''))
     jpeg(paste("TLit/www/output/",sliceSize,"/",theSource,"_gutenberg_entropy.jpg",sep=''))
@@ -852,9 +826,9 @@ for(sliceSize in slice_sizes){
     colnames(links) <- c('source','target','tag')
     colnames(roots) <- c('root_node_id','tag')
     
-    write.table(nodes,file=paste0("TLit/www/output/",sliceSize,"/",theSource,"_nodes.csv"))
-    write.table(links,file=paste0("TLit/www/output/",sliceSize,"/",theSource,"_links.csv"))
-    write.table(roots,file=paste0("TLit/www/output/",sliceSize,"/",theSource,"_roots.csv"))
+    write.table(nodes,file=paste0("TLit/www/output/",sliceSize,"/",theSource,"_nodes.csv"), row.names = F)
+    write.table(links,file=paste0("TLit/www/output/",sliceSize,"/",theSource,"_links.csv"), row.names = F)
+    write.table(roots,file=paste0("TLit/www/output/",sliceSize,"/",theSource,"_roots.csv"), row.names = F)
     
     linksDelta <- as.integer(links$target)-as.integer(links$source)
     jpeg(paste0("TLit/www/output/",sliceSize,"/",theSource,"_links_delta.jpg"))
@@ -1204,7 +1178,7 @@ for(sliceSize in slice_sizes){
     plot( x=0:max(deg), y=1-deg.dist, pch=19, cex=1.2, col="orange", xlab="Degree", ylab="Cumulative Frequency")
     dev.off()
     
-    write.table(socEdges,file=paste0("TLit/www/output/",sliceSize,"/",theSource,"_socialnetwork_links.csv"))
+    write.table(socEdges,file=paste0("TLit/www/output/",sliceSize,"/",theSource,"_socialnetwork_links.csv"), row.names = F)
     
     hnetwork <- asNetwork(h)
     
