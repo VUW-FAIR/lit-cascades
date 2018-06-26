@@ -34,7 +34,6 @@ library(igraph)
 library(ggplot2)
 library(plotly)
 library(gtools)
-library(tsna)
 library(openNLP)
 library(RWeka)
 library(vegan)
@@ -51,7 +50,7 @@ degree.distribution <- function (graph, cumulative = FALSE, ...)
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  cs <- degree(graph, ...)
+  cs <- igraph::degree(graph, ...)
   hi <- hist(cs, -1:max(cs), plot = FALSE)$count
   if (!cumulative) {
     res <- hi
