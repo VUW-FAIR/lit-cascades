@@ -193,7 +193,7 @@ for(sliceSize in slice_sizes){
         tdm <- TermDocumentMatrix(a, control = list(tokenize = nGramTokenizer))
         #tdm <- removeSparseTerms(tdm, 0.75)
         
-        charDS <- rbind(charDS, data.frame(i,paste(unique(tdm$dimnames$Terms), collapse=', ')),stringsAsFactors=F)
+        charDS <- rbind(charDS, data.frame(i,paste(unique(tdm$dimnames$Terms), collapse=', ')), stringsAsFactors=F)
       }
     }
     
