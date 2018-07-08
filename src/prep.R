@@ -175,33 +175,28 @@ for(sliceSize in list(1000, "sentence")){
     write.table(links,file=paste0("../resources/output/", sliceSize,"/", theSource,"_links.csv"), row.names = F)
     write.table(roots,file=paste0("../resources/output/", sliceSize,"/", theSource,"_roots.csv"), row.names = F)
     
-    linksDelta <- as.integer(links$target)-as.integer(links$source)
-    jpeg(paste0("../resources/output/",sliceSize,"/",theSource,"_links_delta.jpg"))
-    as.data.frame(linksDelta) %>% 
-      mutate(., row = c(1:nrow(.))) %>%
-    ggplot() +
-      aes(x = row , y = linksDelta) +
-      geom_histogram(stat = "identity") +
-      NULL
-    dev.off()
-    
+    linksDelta <- as.integer(links$target) - as.integer(links$source)
+    ggsave(paste0("../resources/output/",sliceSize,"/",theSource,"_links_delta.jpg"),
+           plot = as.data.frame(linksDelta) %>% 
+             mutate(., row = c(1:nrow(.))) %>%
+             ggplot() +
+             aes(x = row , y = linksDelta) +
+             geom_histogram(stat = "identity") +
+             NULL)
     linksDelta.count <- plyr::count(linksDelta)
-    jpeg(paste0("../resources/output/",sliceSize,"/",theSource,"_links_delta_distri.jpg"))
-    ggplot(linksDelta.count) +
-      aes(x = x , y = freq) +
-      geom_point() +
-      NULL
-    dev.off()
-    
-    jpeg(paste0("../resources/output/",sliceSize,"/",theSource,"_links_delta_distri_loglog.jpg"))
-      ggplot(linksDelta.count) +
-      aes(x = x , y = freq) +
-      geom_point() +
-          scale_x_log10() +
-          scale_y_log10() +
-          NULL
-    dev.off()
-    
+    ggsave(paste0("../resources/output/",sliceSize,"/",theSource,"_links_delta_distri.jpg"),
+           plot =     ggplot(linksDelta.count) +
+             aes(x = x , y = freq) +
+             geom_point() +
+             NULL)
+
+    ggsave(paste0("../resources/output/",sliceSize,"/",theSource,"_links_delta_distri_loglog.jpg"),
+           plot = ggplot(linksDelta.count) +
+             aes(x = x , y = freq) +
+             geom_point() +
+             scale_x_log10() +
+             scale_y_log10() +
+             NULL)  
     #power law?
     
     m_bl = poweRlaw::displ$new(linksDelta)
@@ -229,7 +224,6 @@ for(sliceSize in list(1000, "sentence")){
     }
     uniqueLinks <- unique(uniqueLinks)
     colnames(uniqueLinks) <- c("id1","id2","label")
-    colnames(links) <- c("id1","id2","label")
     g <- graph.data.frame(uniqueLinks,directed = TRUE)
     
     nLabels <- c()
@@ -268,23 +262,12 @@ for(sliceSize in list(1000, "sentence")){
     degd <- degree.distribution(g)
     wtc <- cluster_walktrap(g)
     gstat <- c(diameter(g), min(degd), max(degd), mean(degd), edge_density(g), modularity(wtc))
-    write.table(c(theSource,gstat), paste0("../resources/output/", sliceSize, "/",
-                                           theSource,"_netstat_combined.csv"),
-                append = T, col.names = F, row.names = F, sep = ";")
-    write.table(gstat, paste("../resources/output/", sliceSize,"/",
-                             theSource,"_netstat.csv",sep=''),
-                col.names = F, row.names = F, sep = ";")
+    write.table(c(theSource,gstat), paste0("../resources/output/", sliceSize, "/", theSource,"_netstat_combined.csv"), append = T, col.names = F, row.names = F, sep = ";")
+    write.table(gstat, paste0("../resources/output/", sliceSize,"/", theSource,"_netstat.csv"),  col.names = F, row.names = F, sep = ";")
     
     nodes <- as.data.frame(nodes, stringsAsFactors=F)
     colnames(nodes) <- c('id','title','label')
-    nodes$id <- as.numeric(nodes$id)
-    
-    links <- as.data.frame(links)
-    colnames(links) <- c('from', 'to', 'title')
-    links$from <- unlist(links$from)
-    links$to <- unlist(links$to)
-    links$title <- unlist(links$title)
-    
+
     
 #### create the character network from the cascade
      socN1 <- c()
@@ -372,10 +355,18 @@ for(sliceSize in list(1000, "sentence")){
     colnames(netm) <- V(h)$name
     rownames(netm) <- V(h)$name
     
-    palf <- colorRampPalette(c("gold", "dark orange")) 
-    pdf(paste("../resources/output/", sliceSize, "/", theSource, "_gutenberg_dh_socnet_heatmap.pdf", sep=''))
-    heatmap(netm[,17:1], Rowv = NA, Colv = NA, col = palf(100), scale = "none", margins = c(20,20) )
-    dev.off()
+    ### Trying to convert netm to a ggplotable data frame
+
+      as.data.frame(netm) %>% 
+      tibble::rownames_to_column() %>%
+      gather(., ... = -rowname)  %>%
+      ggplot() +
+      aes(rowname, key) +
+      geom_tile(aes(fill = value), color = "white") +
+      scale_fill_gradient(low = "white", high = "red1") +
+      theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+      NULL
+      ggsave(paste0("../resources/output/", sliceSize, "/", theSource, "_gutenberg_dh_socnet_heatmap.pdf"))
     
     #stats for the social graph
     degd <- degree.distribution(h)
@@ -383,29 +374,45 @@ for(sliceSize in list(1000, "sentence")){
     gstat <- c(diameter(h),min(degd),max(degd),mean(degd),edge_density(h),modularity(wtc))
     write.table(c(theSource,gstat),paste0("../resources/output/",sliceSize,"/",theSource,"_socnetstat_combined.csv"), append = T, col.names = F, row.names = F, sep = ";")
     write.table(gstat,paste("../resources/output/",sliceSize,"/",theSource,"_socnetstat.csv",sep=''),col.names = F,row.names = F, sep = ";")
+    write.table(links[,c("target", "tag")], file = paste0("../resources/output/", sliceSize, "/", theSource, '_gutenberg_targets.txt'))
+    write.table(links[,c("source", "tag")], file = paste0("../resources/output/", sliceSize, "/", theSource, "_gutenberg_sources.txt"))
     
     ####
+    links <- links %>%
+             mutate(rownumber = seq.int(nrow(.)))
+    ggsave(paste0("../resources/output/",sliceSize,"/",theSource,"_gutenberg_links_source_nrow.jpg"),
+           plot = links %>%
+                  ggplot() +
+                  aes(x = target, y = rownumber, group = 1) +
+                  geom_point() +
+                  labs(y = "Rownumber") +
+                  theme_classic())
     
-    jpeg(paste("../resources/output/",sliceSize,"/",theSource,"_gutenberg_links_source_nrow.jpg",sep=''))
-    plot(links[,2],c(1:nrow(links)),pch=".")
-    dev.off()
+    ggsave(paste0("../resources/output/",sliceSize,"/",theSource,"_gutenberg_links_targets.jpg"),
+           plot = links %>%
+                  ggplot() +
+                  aes(x = target) +
+                  geom_bar() +
+                  labs(y = "Count") +
+                  theme_classic())
     
-    jpeg(paste("../resources/output/",sliceSize,"/",theSource,"_gutenberg_links_targets.jpg",sep=''))
-    plot(count(unlist(links[,2]))$freq,type='l')
-    dev.off()
-    write.csv(cbind(unlist(links[,2]),links[,3]),file=paste("../resources/output/",sliceSize,"/",theSource,'_gutenberg_targets.txt',sep=''))
-    
-    jpeg(paste("../resources/output/",sliceSize,"/",theSource,"_gutenberg_links_sources.jpg",sep=''))
-    plot(count(unlist(links[,1]))$freq,type='l')
-    dev.off()
-    write.csv(cbind(unlist(links[,1]),links[,3]),file=paste("../resources/output/",sliceSize,"/",theSource,"_gutenberg_sources.txt",sep=''))
+    ggsave(paste0("../resources/output/",sliceSize,"/",theSource,"_gutenberg_links_sources.jpg"),
+           plot = links %>%
+             ggplot() +
+             aes(x = source) +
+             geom_bar() +
+             labs(y = "Count") +
+             theme_classic())
+
+
+
     
     
     casc <- c()
     inter <- c()
     ent <- data.frame(ww = numeric(0), xx = numeric(0), yy = numeric(0), zz = numeric(0))
     wien <- c()
-    colnames(links) <- c('source','target','tag')
+    colnames(links) <- c('source', 'target', 'tag')
     
     coordinates <- c()
     spec <- list()
@@ -472,47 +479,88 @@ for(sliceSize in list(1000, "sentence")){
         }}
         
       #}
-      colnames(ent)<-c('empEntropy','evenness_log2','entropy','evenness')
-      colnames(wien)<-c('ShannonWiener','Pielou','Richness')
+      colnames(ent)<-c('empEntropy', 'evenness_log2', 'entropy', 'evenness')
+      colnames(wien)<-c('ShannonWiener', 'Pielou', 'Richness')
       
       #add node
-      g1 <- add_vertices(g1,1,attr = list(id=as.numeric(nodes[z,1])))
+      g1 <- add_vertices(g1,1,attr = list(id = as.numeric(nodes[z,1])))
       
       #add all links to node
-      theLinks <- unique(links[which(links[,2]==nodes[z,1]),1:2])
+      theLinks <- unique(links[which(links[,2] == nodes[z,1]),1:2])
       for(srclnk in theLinks[,1]){
-        g1 <- add_edges(g1,c(which(V(g1)$id==srclnk),which(V(g1)$id==as.numeric(nodes[z,1]))))
+        g1 <- add_edges(g1, c(which(V(g1)$id == srclnk), which(V(g1)$id == as.numeric(nodes[z,1]))))
       }
       
       #degd <- degree.distribution(g1)
       wtc <- cluster_walktrap(g1)
-      struct <- rbind(struct,c(diameter(g1),edge_density(g1),modularity(wtc)))
+      struct <- rbind(struct, c(diameter(g1), edge_density(g1), modularity(wtc)))
     }
-    colnames(coordinates) <- c("t","specificity","diversity")
+    #colnames(coordinates) <- c("t","specificity","diversity")
+    #data.frame(coordinates) %>%
+      #ggplot() +
+      #aes(x = specificity, y = diversity, colour = t) +
+      #geom_jitter()
+    
+    
     jpeg(paste("../resources/output/",sliceSize,"/",theSource,"_gutenberg_coordinates.jpg",sep=''))
     scatterplot3d(coordinates[,2],coordinates[,1],coordinates[,3],pch=16, highlight.3d=TRUE,type="h",xlab="Specificity",ylab="Node index",zlab="Diversity")
     dev.off()
     
-    write.table(cbind(coordinates, wien, struct),file=paste0("../resources/output/",sliceSize,"/",theSource,"_temporal_statistics.csv"), row.names = F, col.names = F, sep = ";")
+    write.table(cbind(coordinates, wien, struct),
+                file=paste0("../resources/output/", sliceSize, "/", theSource,
+                            "_temporal_statistics.csv"), row.names = F, col.names = F, sep = ";")
     
-    write.table(ent, file = paste0("../resources/output/",sliceSize,"/",theSource,"_gutenberg_entropy.txt"))
-    jpeg(paste("../resources/output/",sliceSize,"/",theSource,"_gutenberg_entropy.jpg",sep=''))
-    plot(ent[,1],type="l")
-    dev.off()
-    jpeg(paste("../resources/output/",sliceSize,"/",theSource,"_gutenberg_evenness.jpg",sep=''))
-    plot(ent[,2],type="l")
-    dev.off()
+    write.table(ent, file = paste0("../resources/output/", sliceSize, "/",
+                                   theSource, "_gutenberg_entropy.txt"), sep = ";")
     
-    write.csv(wien,file=paste("../resources/output/",sliceSize,"/",theSource,"_gutenberg_diversity.txt",sep=''))
-    jpeg(paste("../resources/output/",sliceSize,"/",theSource,"_gutenberg_shannonwiener.jpg",sep=''))
-    plot(wien[,1],type="l")
-    dev.off()
-    jpeg(paste("../resources/output/",sliceSize,"/",theSource,"_gutenberg_pielou.jpg",sep=''))
-    plot(wien[,2],type="l")
-    dev.off()
-    jpeg(paste("../resources/output/",sliceSize,"/",theSource,"_gutenberg_richness.jpg",sep=''))
-    plot(wien[,3],type="l")
-    dev.off()
+    write.table(wien, file = paste0("../resources/output/", sliceSize, "/",
+                                    theSource, "_gutenberg_diversity.txt"), sep = ";")
+    ent_plot <- as.data.frame(ent) %>%
+                mutate(rownumber = seq.int(nrow(.)))
     
+    wien_plot <- as.data.frame(wien) %>%
+      mutate(rownumber = seq.int(nrow(.)))
+    
+    ggsave(paste0("../resources/output/", sliceSize, "/", theSource,"_gutenberg_entropy.jpg"),
+           plot = ent_plot %>%
+                  ggplot() +
+                  aes(x = rownumber, y = .$empEntropy, group = 1) +
+                  geom_line() +
+                  labs(y = "Entropy") +
+                  theme_classic())
+    
+    ggsave(paste0("../resources/output/", sliceSize, "/", theSource,"_gutenberg_evenness.jpg"),
+           plot = ent_plot %>%
+                  ggplot() +
+                  aes(x = rownumber, y = .$evenness_log2, group = 1) +
+                  geom_line() +
+                  labs(y = "Log Evenness") +
+                  theme_classic())
+
+    ggsave(paste0("../resources/output/", sliceSize, "/",
+                  theSource, "_gutenberg_shannonwiener.jpg"),
+           plot = wien_plot %>%
+                  ggplot() +
+                  aes(x = rownumber, y = .$ShannonWiener, group = 1) +
+                  geom_line() +
+                  labs(y = "Shannon Wiener") +
+                  theme_classic())
+    
+    ggsave(paste0("../resources/output/",sliceSize,"/",theSource,"_gutenberg_pielou.jpg"),
+           plot = wien_plot %>%
+                  ggplot() +
+                  aes(x = rownumber, y = .$Pielou, group = 1) +
+                  geom_line() +
+                  labs(y = "Pielou") +
+                  theme_classic())
+
+    ggsave(paste0("../resources/output/",sliceSize,"/",theSource,"_gutenberg_richness.jpg"),
+           plot = wien_plot %>%
+                  ggplot() +
+                  aes(x = rownumber, y = .$Richness, group = 1) +
+                  geom_line() +
+                  labs(y = "Richness") +
+                  theme_classic())
+
   }  
 }
