@@ -345,20 +345,25 @@ for(sliceSize in list(1000, "sentence")){
     co <- layout_with_fr(h, minx = minC, maxx = maxC,
                           miny = minC, maxy = maxC)
     
-    pdf(paste("../resources/output/",sliceSize,"/",theSource,"_gutenberg_dh_socnet2.pdf",sep=''))
-      plot(h, layout=co,
-      vertex.size=2,vertex.label.cex=0.2,edge.label.cex=0.2,
-      edge.arrow.size=0.1, rescale=TRUE,vertex.label.dist=0)
+    pdf(paste0("../resources/output/",sliceSize,"/",theSource,"_gutenberg_dh_socnet2.pdf"))
+      plot(h, layout = co,
+      vertex.size = 2,vertex.label.cex = 0.2,edge.label.cex = 0.2,
+      edge.arrow.size = 0.1, rescale = TRUE,vertex.label.dist = 0)
     dev.off()
 
     netm <- as_adjacency_matrix(h, attr = "weight", sparse = F)
     colnames(netm) <- V(h)$name
     rownames(netm) <- V(h)$name
+    write.table(netm, paste0("../resources/output/",
+                             sliceSize,"/",theSource,"_network_matrix.csv"), 
+                col.names = NA, row.names = T,
+                fileEncoding = "UTF-8",
+                sep = " ")
+
     
     ### Trying to convert netm to a ggplotable data frame
-
       as.data.frame(netm) %>% 
-      tibble::rownames_to_column() %>%
+      tibble::rownames_to_column() %>% 
       gather(., ... = -rowname)  %>%
       ggplot() +
       aes(rowname, key) +
@@ -420,7 +425,7 @@ for(sliceSize in list(1000, "sentence")){
     
     g1 <- make_empty_graph(n = 0, directed = TRUE)
     struct <- c()
-    
+    props <- c()
     for(z in 1:nrow(nodes)){
         if(nodes[z,]$title == ""){
           if(nrow(ent) > 0){
@@ -452,8 +457,11 @@ for(sliceSize in list(1000, "sentence")){
         }
         
         interact <- list()
+        cooccure <- list()
+        #temp1 <- c()
         for(v in 1:nrow(inter)){
           interactions <- unlist(strsplit(unlist(inter[v,1]),', '))
+          #temp1 <- rbind(temp1, gtools::combinations(length(interactions), 2, interactions))
           for( m in 1:length(interactions)){
             if(is.null(interact[[interactions[m]]])) interact[[interactions[m]]] <- 1
             else interact[[interactions[m]]] <- interact[[interactions[m]]] + 1
@@ -524,7 +532,7 @@ for(sliceSize in list(1000, "sentence")){
     ggsave(paste0("../resources/output/", sliceSize, "/", theSource,"_gutenberg_entropy.jpg"),
            plot = ent_plot %>%
                   ggplot() +
-                  aes(x = rownumber, y = .$empEntropy, group = 1) +
+                  aes(x = rownumber, y = empEntropy, group = 1) +
                   geom_line() +
                   labs(y = "Entropy") +
                   theme_classic())
@@ -532,7 +540,7 @@ for(sliceSize in list(1000, "sentence")){
     ggsave(paste0("../resources/output/", sliceSize, "/", theSource,"_gutenberg_evenness.jpg"),
            plot = ent_plot %>%
                   ggplot() +
-                  aes(x = rownumber, y = .$evenness_log2, group = 1) +
+                  aes(x = rownumber, y = evenness_log2, group = 1) +
                   geom_line() +
                   labs(y = "Log Evenness") +
                   theme_classic())
@@ -541,7 +549,7 @@ for(sliceSize in list(1000, "sentence")){
                   theSource, "_gutenberg_shannonwiener.jpg"),
            plot = wien_plot %>%
                   ggplot() +
-                  aes(x = rownumber, y = .$ShannonWiener, group = 1) +
+                  aes(x = rownumber, y = ShannonWiener, group = 1) +
                   geom_line() +
                   labs(y = "Shannon Wiener") +
                   theme_classic())
@@ -549,7 +557,7 @@ for(sliceSize in list(1000, "sentence")){
     ggsave(paste0("../resources/output/",sliceSize,"/",theSource,"_gutenberg_pielou.jpg"),
            plot = wien_plot %>%
                   ggplot() +
-                  aes(x = rownumber, y = .$Pielou, group = 1) +
+                  aes(x = rownumber, y = Pielou, group = 1) +
                   geom_line() +
                   labs(y = "Pielou") +
                   theme_classic())
@@ -557,7 +565,7 @@ for(sliceSize in list(1000, "sentence")){
     ggsave(paste0("../resources/output/",sliceSize,"/",theSource,"_gutenberg_richness.jpg"),
            plot = wien_plot %>%
                   ggplot() +
-                  aes(x = rownumber, y = .$Richness, group = 1) +
+                  aes(x = rownumber, y = Richness, group = 1) +
                   geom_line() +
                   labs(y = "Richness") +
                   theme_classic())
