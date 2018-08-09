@@ -503,17 +503,20 @@ for(sliceSize in list(1000, "sentence")){
       wtc <- cluster_walktrap(g1)
       struct <- rbind(struct, c(diameter(g1), edge_density(g1), modularity(wtc)))
     }
-    #colnames(coordinates) <- c("t","specificity","diversity")
-    #data.frame(coordinates) %>%
-      #ggplot() +
-      #aes(x = specificity, y = diversity, colour = t) +
-      #geom_jitter()
-    
-    
-    jpeg(paste("../resources/output/",sliceSize,"/",theSource,"_gutenberg_coordinates.jpg",sep=''))
-    scatterplot3d(coordinates[,2],coordinates[,1],coordinates[,3],pch=16, highlight.3d=TRUE,type="h",xlab="Specificity",ylab="Node index",zlab="Diversity")
-    dev.off()
-    
+
+    scatterd <- plotly::plot_ly(as.data.frame(coordinates), x = ~V1, y = ~V2, z = ~V3)  %>%
+                 layout(
+                 title = "Specificity / Diversity",
+                 scene = list(
+                 xaxis = list(title = "Specificity"),
+                 yaxis = list(title = "Node Index"),
+                 zaxis = list(title = "Diversity")
+                 ))
+    #wd <- as.character(getwd())
+    #htmlwidgets::saveWidget(as_widget(scatterd),
+     #                       file = paste0("../resources/output/","resources/output/","gutenberg_coordinates.html"),
+      #                      selfcontained = T)
+
     write.table(cbind(coordinates, wien, struct),
                 file=paste0("../resources/output/", sliceSize, "/", theSource,
                             "_temporal_statistics.csv"), row.names = F, col.names = F, sep = ";")
