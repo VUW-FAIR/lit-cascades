@@ -136,7 +136,7 @@ for(sliceSize in list(1000, "sentence")){
     
 
         #character list
-        trait_words <- tolower(readLines('../resources/pda500.txt'))
+        trait_words <- tolower(readLines('../resources/alport-list.txt'))
     
         outer_lapply <- lapply(words300B, function(xx){
             inner_lapply <- Filter(Negate(is.null), lapply(trait_words, function(kk){
