@@ -144,9 +144,9 @@ for(sliceSize in list(1000, "sentence")){
 
         #character list
         #trait_words <- tolower(readLines('../resources/random-500.txt'))
-        trait_words <- tolower(readLines(paste0("../resources/output/",
-                                                theSource,"_random.csv")))
-        #trait_words <- tolower(readLines('../resources/Personal Traits.txt'))
+        #trait_words <- tolower(readLines(paste0("../resources/output/",
+        #                                        theSource,"_random.csv")))
+        trait_words <- tolower(readLines('../resources/Personal Traits.txt'))
         outer_lapply <- lapply(words300B, function(xx){
             xx <- gsub(",|\\.|;|:|\\'\\\\\"",'', xx)
             xx <- unlist(strsplit(xx, split = ' '))
