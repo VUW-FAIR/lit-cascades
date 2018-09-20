@@ -110,6 +110,13 @@ for(sliceSize in list(1000, "sentence")){
     #split by number of words and chapters
     if(is.numeric(sliceSize)){
     full_text <- strsplit(processedText, "(?i:Chapter [0-9A-Z]+[\\.]?[\\s.]?)", perl=T)[[1]]
+    corpus <- tm::VCorpus(tm::VectorSource(processedText))
+    corpus <- tm::tm_map(corpus, tm::content_transformer(tm::removePunctuation))
+    corpus <- tm::tm_map(corpus, tm::content_transformer(tm::removeNumbers))
+    tdm <- as.matrix(tm::TermDocumentMatrix(corpus,
+                     control = list(wordLength = c(3, Inf))))
+    random500 <- sample(rownames(tdm), 500)
+    readr::write_lines(random500, paste0("../resources/output/", theSource,"_random.csv"))
     words300B <- c()
     tmp <- lapply(full_text, function(x){
       snippet <- strsplit(x, "\\s+")[[1]]
@@ -136,8 +143,10 @@ for(sliceSize in list(1000, "sentence")){
     
 
         #character list
-        trait_words <- tolower(readLines('../resources/Personal Traits.txt'))
-    
+        #trait_words <- tolower(readLines('../resources/random-500.txt'))
+        trait_words <- tolower(readLines(paste0("../resources/output/",
+                                                theSource,"_random.csv")))
+        #trait_words <- tolower(readLines('../resources/Personal Traits.txt'))
         outer_lapply <- lapply(words300B, function(xx){
             xx <- gsub(",|\\.|;|:|\\'\\\\\"",'', xx)
             xx <- unlist(strsplit(xx, split = ' '))

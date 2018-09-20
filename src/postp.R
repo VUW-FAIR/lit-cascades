@@ -16,16 +16,33 @@ trait_df <- dplyr::add_rownames(trait_df, "X")
   
 
 ## Creating a list with all co-ocurrence matrices for all outputs
-allmatrices <- list.files(paste0("../resources/output/", "sentence", "/"),
+allmatrices <- list.files(paste0("../resources/output/", "1000", "/"),
                             pattern = "(.*)_network_matrix.csv",
+                            full.names = T)
+
+alllinks <- list.files(paste0("../resources/output/", "1000", "/"),
+                            pattern = "(.*)_links.csv",
                             full.names = T)
 ## Fetching the data of the co-ocurrence matrices
 cooc <- lapply(allmatrices, function(x) read.table(x, header = T, check.names = F))
-
+link <- lapply(alllinks, function(x) read.table(x, header = T, check.names = F,
+                                                stringsAsFactors = F))
 for(bb in 1:length(cooc)){
   colnames(cooc[[bb]])[1] <- "X"
 }
 
+cor_list <- list()
+for(sent in link){
+  keyword_cors <- sent %>% 
+  group_by(tag) %>%
+  #filter(n() >= 50) %>%
+  widyr::pairwise_cor(tag, target, sort = TRUE, upper = T)
+  keyword_mat <- reshape2::acast(keyword_cors, item1 ~ item2,
+                                 value.var = "correlation")
+  keyword_mat[is.na(keyword_mat)] <- 1
+  
+  cor_list[[length(cor_list) + 1]] <- keyword_mat
+}
 
 ## Fusing the individuals matrices into a single filled matrix
 #cooc[[length(cooc) + 1]] <- trait_df
@@ -36,7 +53,12 @@ for(bb in 1:length(cooc)){
 
 plotlist <- list()
 for (mat in cooc){
-  rownames(mat) <- mat$X
+  
+  cor_dis <- smacof::sim2diss(cor_list[[1]])
+  MDS <- smacof::mds(cor_dis, type = "ordinal", ndim = 2,
+                     itmax = 2000)
+   
+   rownames(mat) <- mat$X
   mat <- mat[-1]
   mat <- mat[,order(names(mat))]
   MDS <- smacof::mds(mat, type = "ordinal", ndim = 3,
