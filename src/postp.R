@@ -1,7 +1,7 @@
 library(tidyverse)
 library(readr)
 
-trait_words <- read_csv('../resources/pda500.txt', col_names = F) %>%
+trait_words <- read_csv('../resources/random-500.txt', col_names = F) %>%
                 .[[1]] %>% tolower(.) %>% unique(.)
 
 ## Creating empty data frame for storage
@@ -16,11 +16,11 @@ trait_df <- dplyr::add_rownames(trait_df, "X")
   
 
 ## Creating a list with all co-ocurrence matrices for all outputs
-allmatrices <- list.files(paste0("../resources/output/", "1000", "/"),
+allmatrices <- list.files(paste0("../outputs save/random wordlist/", "sentence", "/"),
                             pattern = "(.*)_network_matrix.csv",
                             full.names = T)
 
-alllinks <- list.files(paste0("../resources/output/", "1000", "/"),
+alllinks <- list.files(paste0("../outputs save/random wordlist/", "sentence", "/"),
                             pattern = "(.*)_links.csv",
                             full.names = T)
 ## Fetching the data of the co-ocurrence matrices
@@ -52,6 +52,7 @@ for(sent in link){
 #result <- aggregate(binded[-1], by = list(binded$X), FUN = sum)
 
 plotlist <- list()
+plotnumber <- 1
 for (mat in cooc){
   
   cor_dis <- smacof::sim2diss(cor_list[[1]])
@@ -73,9 +74,17 @@ for (mat in cooc){
                      itmax = 2000)
   coordinates <- as.data.frame(MDS$conf) %>%
     tibble::rownames_to_column()
-  plot(coordinates$D1, coordinates$D2, pch = ".")
-  text(coordinates$D1, coordinates$D2, pos = 4,
-       cex = .5, labels = coordinates$rowname)
+  
+  ggsave(filename = paste0(paste0("../outputs save/random wordlist/", "sentence", "/"),
+                           "plot",plotnumber,".svg"),
+                            device = "svg",
+         plot =   coordinates %>%
+                  ggplot() +
+                  aes(x = D1, y = D2) +
+                  geom_point() +
+                  geom_text(aes(label = rowname)) +
+                  theme_classic())
+plotnumber <- plotnumber + 1
   
   ## Removing 0 from matrix
   #cleaned_result <- result[-which(rowSums(result) <= 10),
