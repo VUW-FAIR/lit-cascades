@@ -37,8 +37,10 @@ library(openNLP)
 library(RWeka)
 library(vegan)
 library(poweRlaw)
+library(rJava)
 
-#housekeeping and helpers
+coreNLP::initCoreNLP()
+  #housekeeping and helpers
 options(scipen = 999)
 
 # Functions ---------------------------------------------------------------
@@ -134,11 +136,40 @@ for(sliceSize in list(1000, "sentence")){
     }
     
     } else if (sliceSize == "sentence"){
+      t_before <- Sys.time()
+      annotation <- coreNLP::annotateString(processedText)
+      t_1_after <- Sys.time()
+      tokens <- coreNLP::getToken(annotation)
+      t_2_after <- Sys.time()
+      coreNLP::getDependency(annotation, type = "basic")
+      t_3_after <- Sys.time()
+      coreNLP::getCoreference(annotation)
+      t_4_after <- Sys.time()
+      coreNLP::getSentiment(annotation)
+      t_5_after <- Sys.time()
       sent_token_annot <- openNLP::Maxent_Sent_Token_Annotator()
+      t_6_after <- Sys.time()
+      word_token_annotator <- openNLP::Maxent_Word_Token_Annotator()
+      t_7_after <- Sys.time()
+      pos_tag_annotator <- openNLP::Maxent_POS_Tag_Annotator()
+      t_8_after <- Sys.time()
       NLP_text <- NLP::as.String(processedText)
+      t_9_after <- Sys.time()
+      a2 <- NLP::annotate(NLP_text, list(sent_token_annot, word_token_annotator))
+      t_10_after <- Sys.time()
+      a3 <- NLP::annotate(NLP_text, pos_tag_annotator, a2)
+      t_11_after <- Sys.time()
+      a3w <- subset(a3, type == "word")
+      t_12_after <- Sys.time()
+      tags <- sapply(a3w$features, `[[`, "POS")
+      t_13_after <- Sys.time()
       sent_annotate <- NLP::annotate(NLP_text, sent_token_annot)
+      t_14_after <- Sys.time()
       sentences <- NLP_text[sent_annotate]
+      t_15_after <- Sys.time()
       words300B <- sentences
+      t_16_after <- Sys.time()
+      
     }
     
 

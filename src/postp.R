@@ -1,6 +1,6 @@
 library(tidyverse)
 library(readr)
-
+  
 trait_words <- read_csv('../resources/random-500.txt', col_names = F) %>%
                 .[[1]] %>% tolower(.) %>% unique(.)
 
@@ -16,11 +16,11 @@ trait_df <- dplyr::add_rownames(trait_df, "X")
   
 
 ## Creating a list with all co-ocurrence matrices for all outputs
-allmatrices <- list.files(paste0("../outputs save/random wordlist/", "sentence", "/"),
+allmatrices <- list.files(paste0("../outputs save/random wordlist/output/", "1000", "/"),
                             pattern = "(.*)_network_matrix.csv",
                             full.names = T)
 
-alllinks <- list.files(paste0("../outputs save/random wordlist/", "sentence", "/"),
+alllinks <- list.files(paste0("../outputs save/random wordlist/output/", "1000", "/"),
                             pattern = "(.*)_links.csv",
                             full.names = T)
 ## Fetching the data of the co-ocurrence matrices
@@ -30,6 +30,7 @@ link <- lapply(alllinks, function(x) read.table(x, header = T, check.names = F,
 for(bb in 1:length(cooc)){
   colnames(cooc[[bb]])[1] <- "X"
 }
+
 
 cor_list <- list()
 for(sent in link){
@@ -54,28 +55,20 @@ for(sent in link){
 plotlist <- list()
 plotnumber <- 1
 for (mat in cooc){
+lapply(cor_list, function(x){
+  cor_dis <- smacof::sim2diss(x)
+   
+  #rownames(mat) <- mat$X
+  #mat <- mat[-1]
+  #mat <- mat[,order(names(mat))]
+ 
   
-  cor_dis <- smacof::sim2diss(cor_list[[1]])
   MDS <- smacof::mds(cor_dis, type = "ordinal", ndim = 2,
                      itmax = 2000)
-   
-   rownames(mat) <- mat$X
-  mat <- mat[-1]
-  mat <- mat[,order(names(mat))]
-  MDS <- smacof::mds(mat, type = "ordinal", ndim = 3,
-                     itmax = 2000)
-  coordinates <- as.data.frame(MDS$conf) %>%
-    tibble::rownames_to_column()
-  p <- plotly::plot_ly(coordinates, x = ~D1, y = ~D2, z = ~D3, 
-                       name = coordinates$rowname)
-  plotlist[[length(plotlist) + 1]] <- p
-  
-  MDS <- smacof::mds(mat, type = "ordinal", ndim = 2,
-                     itmax = 2000)
   coordinates <- as.data.frame(MDS$conf) %>%
     tibble::rownames_to_column()
   
-  ggsave(filename = paste0(paste0("../outputs save/random wordlist/", "sentence", "/"),
+  ggsave(filename = paste0(paste0("../outputs save/random wordlist/output/", "1000", "/"),
                            "plot",plotnumber,".svg"),
                             device = "svg",
          plot =   coordinates %>%
@@ -85,6 +78,9 @@ for (mat in cooc){
                   geom_text(aes(label = rowname)) +
                   theme_classic())
 plotnumber <- plotnumber + 1
+  
+})
+  
   
   ## Removing 0 from matrix
   #cleaned_result <- result[-which(rowSums(result) <= 10),
