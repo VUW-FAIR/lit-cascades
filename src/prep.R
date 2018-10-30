@@ -20,6 +20,7 @@
 # under the License.
 
 #import libs
+#coreNLP::initCoreNLP()
 library(plyr)
 library(tm)
 library(stringr)
@@ -39,10 +40,9 @@ library(vegan)
 library(poweRlaw)
 library(rJava)
 
-coreNLP::initCoreNLP()
   #housekeeping and helpers
 options(scipen = 999)
-
+allwords <- FALSE
 # Functions ---------------------------------------------------------------
 
 
@@ -91,20 +91,20 @@ tic_generate <- function(inputsequence) {
 }
 
 #set working directoy
-setwd("C:/Users/Johannes.Karl/Documents/GitHub/tic-personality-words/src")
+setwd("/home/STAFF/karljo/tic-personality-words/")
 
 #get all text and char files
-allTextFiles <- list.files("../resources/Text Files")
+allTextFiles <- list.files("resources/Text Files")
 
 for(sliceSize in list(1000, "sentence")){
-  dir.create(file.path("../resources/output/", sliceSize), showWarnings = FALSE)
+  dir.create(file.path("resources/output/", sliceSize), showWarnings = FALSE)
   
   for(nextRun in 1:length(allTextFiles)){
     theSource <- gsub(' ','_', gsub('[[:digit:]][[:digit:]] ','',
                                     gsub(' text.txt','',allTextFiles[nextRun])))
 
-    sourceText <- readChar(paste0('../resources/Text Files/',allTextFiles[nextRun]),
-                           file.info(paste0('../resources/Text Files/',allTextFiles[nextRun]))$size)
+    sourceText <- readChar(paste0('resources/Text Files/',allTextFiles[nextRun]),
+                           file.info(paste0('resources/Text Files/',allTextFiles[nextRun]))$size)
     processedText <- gsub("\\r\\n", " ", sourceText, perl = T)
     processedText <- gsub("\\n", " ", processedText, perl = T)
     
@@ -118,7 +118,7 @@ for(sliceSize in list(1000, "sentence")){
     tdm <- as.matrix(tm::TermDocumentMatrix(corpus,
                      control = list(wordLength = c(3, Inf))))
     random500 <- sample(rownames(tdm), 500)
-    readr::write_lines(random500, paste0("../resources/output/", theSource,"_random.csv"))
+    readr::write_lines(random500, paste0("resources/output/", theSource,"_random.csv"))
     words300B <- c()
     tmp <- lapply(full_text, function(x){
       snippet <- strsplit(x, "\\s+")[[1]]
@@ -146,20 +146,30 @@ for(sliceSize in list(1000, "sentence")){
     
 
         #character list
-        #trait_words <- tolower(readLines('../resources/random-500.txt'))
-        #trait_words <- tolower(readLines(paste0("../resources/output/",
+        #trait_words <- tolower(readLines('resources/random-500.txt'))
+        #trait_words <- tolower(readLines(paste0("resources/output/",
         #                                        theSource,"_random.csv")))
-        trait_words <- tolower(readLines('../resources/Personal Traits.txt'))
+        trait_words <- gsub("\\s*", "", tolower(readLines('resources/Personal Traits.txt')))
         outer_lapply <- lapply(words300B, function(xx){
           annotation <- coreNLP::annotateString(xx)
           tokens <- coreNLP::getToken(annotation)
           Deps <- coreNLP::getDependency(annotation, type = "basic")
           Coref <- coreNLP::getCoreference(annotation)
-          
+          neg_deps <- Deps[Deps$type == "neg",]$governor
+          advs <- tokens[tokens$POS == "JJ",c("lemma","token")]
+          if(allwords){
             xx <- gsub(",|\\.|;|:|\\'\\\\\"",'', xx)
             xx <- unlist(strsplit(xx, split = ' '))
+          } else{
+            xx <- advs$lemma
+          }
             matched <- match(trait_words,xx)
-            trait_words[which(!is.na(matched))]
+            traitwords_out <- trait_words[which(!is.na(matched))]
+            ## Replacing lemmatised word with token word to allow for matching of negative dependencies
+            traitword_out[which(traitword_out == advs$lemma)] <- advs$token[which(advs$lemma == traitword_out)]
+            traitwords_out[which(traitwords_out %in% neg_deps)] <- paste0("#-",traitwords_out[which(traitwords_out %in% neg_deps)])
+            traitwords_out
+          
         })
       
       
@@ -184,11 +194,11 @@ for(sliceSize in list(1000, "sentence")){
 
 # TIC Statistics ----------------------------------------------------------
 ## Can we replace this with a lapply call for a list, saves two lines
-    write.table(nodes,file=paste0("../resources/output/", sliceSize,"/",
+    write.table(nodes,file=paste0("resources/output/", sliceSize,"/",
                                   theSource,"_nodes.csv"), row.names = F)
-    write.table(links,file=paste0("../resources/output/", sliceSize,"/",
+    write.table(links,file=paste0("resources/output/", sliceSize,"/",
                                   theSource,"_links.csv"), row.names = F)
-    write.table(roots,file=paste0("../resources/output/", sliceSize,"/",
+    write.table(roots,file=paste0("resources/output/", sliceSize,"/",
                                   theSource,"_roots.csv"), row.names = F)
 print(paste0(theSource,"1"))
     
@@ -217,8 +227,8 @@ print(paste0(theSource,"1"))
     degd <- degree.distribution(g)
     wtc <- cluster_walktrap(g)
     gstat <- c(diameter(g), min(degd), max(degd), mean(degd), edge_density(g), modularity(wtc))
-    write.table(c(theSource,gstat), paste0("../resources/output/", sliceSize, "/", theSource,"_netstat_combined.csv"), append = T, col.names = F, row.names = F, sep = ";")
-    write.table(gstat, paste0("../resources/output/", sliceSize,"/", theSource,"_netstat.csv"),  col.names = F, row.names = F, sep = ";")
+    write.table(c(theSource,gstat), paste0("resources/output/", sliceSize, "/", theSource,"_netstat_combined.csv"), append = T, col.names = F, row.names = F, sep = ";")
+    write.table(gstat, paste0("resources/output/", sliceSize,"/", theSource,"_netstat.csv"),  col.names = F, row.names = F, sep = ";")
     
     nodes <- as.data.frame(nodes, stringsAsFactors=F)
     colnames(nodes) <- c('id','title','label')
@@ -242,7 +252,7 @@ print(paste0(theSource,"3"))
      }
     socEdges <- do.call("rbind", socEdges)
 
-    write.table(unique(socEdges), file = paste0("../resources/output/",
+    write.table(unique(socEdges), file = paste0("resources/output/",
                                          sliceSize,"/", theSource,
                                          "_socnet_edgelist.csv"), sep = ';',
                                          row.names = F, col.names = F)
@@ -255,7 +265,7 @@ print(paste0(theSource,"3.5"))
 print(paste0(theSource,"3.7"))
     colnames(netm) <- V(h)$name
     rownames(netm) <- V(h)$name
-    write.table(netm, paste0("../resources/output/",
+    write.table(netm, paste0("resources/output/",
                              sliceSize,"/",theSource,"_network_matrix.csv"), 
                 col.names = NA, row.names = T,
                 fileEncoding = "UTF-8",
