@@ -173,10 +173,7 @@ for(sliceSize in list(1000, "sentence")){
             traitwords_out[which(traitwords_out %in% neg_deps)] <- paste0("#-",traitwords_out[which(traitwords_out %in% neg_deps)])
             traitwords_out
             
-          }, warning = function(warning_condition) {
-            print(warning_condition)
-          }, error = function(error_condition) {
-            print(error_condition)}, finally={})
+          }, warning = function(warning_condition) {}, error = function(error_condition) {}, finally={})
         })
       
       
