@@ -39,6 +39,7 @@ library(RWeka)
 library(vegan)
 library(poweRlaw)
 library(rJava)
+library(here)
 
   #housekeeping and helpers
 options(scipen = 999)
@@ -91,7 +92,7 @@ tic_generate <- function(inputsequence) {
 }
 
 #set working directoy
-setwd("/home/STAFF/karljo/tic-personality-words/")
+setwd(here::here())
 
 #get all text and char files
 allTextFiles <- list.files("resources/Text Files")
@@ -166,7 +167,7 @@ for(sliceSize in list(1000, "sentence")){
             matched <- match(trait_words,xx)
             traitwords_out <- trait_words[which(!is.na(matched))]
             ## Replacing lemmatised word with token word to allow for matching of negative dependencies
-            traitword_out[which(traitword_out == advs$lemma)] <- advs$token[which(advs$lemma == traitword_out)]
+            traitwords_out[which(traitwords_out == advs$lemma)] <- advs$token[which(advs$lemma == traitwords_out)]
             traitwords_out[which(traitwords_out %in% neg_deps)] <- paste0("#-",traitwords_out[which(traitwords_out %in% neg_deps)])
             traitwords_out
           
