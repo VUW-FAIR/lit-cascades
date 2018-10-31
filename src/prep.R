@@ -152,25 +152,31 @@ for(sliceSize in list(1000, "sentence")){
         #                                        theSource,"_random.csv")))
         trait_words <- gsub("\\s*", "", tolower(readLines('resources/Personal Traits.txt')))
         outer_lapply <- lapply(words300B, function(xx){
-          annotation <- coreNLP::annotateString(xx)
-          tokens <- coreNLP::getToken(annotation)
-          Deps <- coreNLP::getDependency(annotation, type = "basic")
-          Coref <- coreNLP::getCoreference(annotation)
-          neg_deps <- Deps[Deps$type == "neg",]$governor
-          advs <- tokens[tokens$POS == "JJ",c("lemma","token")]
-          if(allwords){
-            xx <- gsub(",|\\.|;|:|\\'\\\\\"",'', xx)
-            xx <- unlist(strsplit(xx, split = ' '))
-          } else{
-            xx <- advs$lemma
-          }
+          result = tryCatch({
+            
+            annotation <- coreNLP::annotateString(xx)
+            tokens <- coreNLP::getToken(annotation)
+            Deps <- coreNLP::getDependency(annotation, type = "basic")
+            Coref <- coreNLP::getCoreference(annotation)
+            neg_deps <- Deps[Deps$type == "neg",]$governor
+            advs <- tokens[tokens$POS == "JJ",c("lemma","token")]
+            if(allwords){
+              xx <- gsub(",|\\.|;|:|\\'\\\\\"",'', xx)
+              xx <- unlist(strsplit(xx, split = ' '))
+            } else{
+              xx <- advs$lemma
+            }
             matched <- match(trait_words,xx)
             traitwords_out <- trait_words[which(!is.na(matched))]
             ## Replacing lemmatised word with token word to allow for matching of negative dependencies
             traitwords_out[which(traitwords_out == advs$lemma)] <- advs$token[which(advs$lemma == traitwords_out)]
             traitwords_out[which(traitwords_out %in% neg_deps)] <- paste0("#-",traitwords_out[which(traitwords_out %in% neg_deps)])
             traitwords_out
-          
+            
+          }, warning = function(warning_condition) {
+            print(warning_condition)
+          }, error = function(error_condition) {
+            print(error_condition)}, finally={})
         })
       
       
