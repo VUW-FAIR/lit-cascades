@@ -111,11 +111,13 @@ for(sliceSize in list("sentence")){
         words300B
       }
     })
-        for(s in 1:length(tmp)){
+    for(s in 1:length(tmp)){
       if(length(tmp[[s]]) > 0){
         words300B <- c(words300B,tmp[[s]])
       }
     }
+    rm(tmp)
+    gc()
     
     } else if (sliceSize == "sentence"){
       sent_token_annot <- openNLP::Maxent_Sent_Token_Annotator()
@@ -123,7 +125,9 @@ for(sliceSize in list("sentence")){
       sent_annotate <- NLP::annotate(NLP_text, sent_token_annot)
       sentences <- NLP_text[sent_annotate]
       words300B <- sentences
- 
+      rm(NLP_text)
+      rm(sent_annotate)
+      gc()
     }
     
 
