@@ -21,25 +21,6 @@
 
 #import libs
 #coreNLP::initCoreNLP()
-library(plyr)
-library(tm)
-library(stringr)
-library(RTextTools)
-library(digest)
-library(entropy)
-library(scatterplot3d)
-library(RColorBrewer)
-library(tidyr)
-library(igraph)
-library(ggplot2)
-library(plotly)
-library(gtools)
-library(openNLP)
-library(RWeka)
-library(vegan)
-library(poweRlaw)
-library(rJava)
-library(here)
 
   #housekeeping and helpers
 options(scipen = 999)
@@ -49,7 +30,7 @@ allwords <- FALSE
 
 degree.distribution <- function (graph, cumulative = FALSE, ...) 
 {
-  if (!is.igraph(graph)) {
+  if (!igraph::is.igraph(graph)) {
     stop("Not a graph object")
   }
   cs <- igraph::degree(graph, ...)
@@ -97,7 +78,7 @@ setwd(here::here())
 #get all text and char files
 allTextFiles <- list.files("resources/Text Files")
 
-for(sliceSize in list(1000, "sentence")){
+for(sliceSize in list("sentence")){
   dir.create(file.path("resources/output/", sliceSize), showWarnings = FALSE)
   
   for(nextRun in 1:length(allTextFiles)){
@@ -184,7 +165,12 @@ for(sliceSize in list(1000, "sentence")){
                            y = unlist(unique_trait),
                            stringsAsFactors = FALSE)
       
-
+    #garbage collection  
+    rm(words300B)
+    rm(sentences)
+    rm(outer_lapply)
+    rm(unique_trait)
+    gc()
     
     tic <- tic_generate(charDS)
     
@@ -218,10 +204,10 @@ print(paste0(theSource,"1"))
     }
     uniqueLinks <- unique(uniqueLinks)
     colnames(uniqueLinks) <- c("id1","id2","label")
-    g <- graph.data.frame(uniqueLinks,directed = TRUE)
-    
+    g <- igraph::graph.data.frame(uniqueLinks,directed = TRUE)
+
     nLabels <- c()
-    for(z in V(g)$name){
+    for(z in igraph::V(g)$name){
       nLabels <- c(nLabels,paste(unique(unlist(strsplit(paste(uniqueLinks[which(uniqueLinks$id1==z | uniqueLinks$id2==z),3],collapse = ', '),', '))),collapse = ', '))
     }
    print(paste0(theSource,"2"))
@@ -229,8 +215,8 @@ print(paste0(theSource,"1"))
     deg <-  igraph::degree(g, mode="all")
     
     degd <- degree.distribution(g)
-    wtc <- cluster_walktrap(g)
-    gstat <- c(diameter(g), min(degd), max(degd), mean(degd), edge_density(g), modularity(wtc))
+    wtc <- igraph::cluster_walktrap(g)
+    gstat <- c(igraph::diameter(g), min(degd), max(degd), mean(degd), igraph::edge_density(g), igraph::modularity(wtc))
     write.table(c(theSource,gstat), paste0("resources/output/", sliceSize, "/", theSource,"_netstat_combined.csv"), append = T, col.names = F, row.names = F, sep = ";")
     write.table(gstat, paste0("resources/output/", sliceSize,"/", theSource,"_netstat.csv"),  col.names = F, row.names = F, sep = ";")
     
@@ -262,18 +248,25 @@ print(paste0(theSource,"3"))
                                          row.names = F, col.names = F)
     socEdges <- plyr::count(socEdges)
     colnames(socEdges) <- c("id1", "id2", "label")
-    h <- graph.data.frame(socEdges, directed = F)
+    h <- igraph::graph.data.frame(socEdges, directed = F)
 print(paste0(theSource,"3.5"))
-    E(h)$weight <- E(h)$label
-    netm <- as_adjacency_matrix(h, attr = "weight", sparse = F)
+igraph::E(h)$weight <- E(h)$label
+    netm <- igraph::as_adjacency_matrix(h, attr = "weight", sparse = F)
 print(paste0(theSource,"3.7"))
-    colnames(netm) <- V(h)$name
-    rownames(netm) <- V(h)$name
+    colnames(netm) <- igraph::V(h)$name
+    rownames(netm) <- igraph::V(h)$name
     write.table(netm, paste0("resources/output/",
                              sliceSize,"/",theSource,"_network_matrix.csv"), 
                 col.names = NA, row.names = T,
                 fileEncoding = "UTF-8",
                 sep = " ")
 print(paste0(theSource,"4"))
+
+  #garbage collection  
+  rm(socEdges)
+  rm(links)
+  rm(nodes)
+  rm(roots)
+  gc()
   }  
 }
