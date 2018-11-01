@@ -19,6 +19,11 @@
 # specific language governing permissions and limitations
 # under the License.
 
+#set working directoy
+setwd(here::here())
+
+Rprof(profile_out <- "profile.txt")
+
 #import libs
 #coreNLP::initCoreNLP()
 
@@ -71,9 +76,6 @@ tic_generate <- function(inputsequence) {
       }
       return(list(nodes, links, roots))
 }
-
-#set working directoy
-setwd(here::here())
 
 #get all text and char files
 allTextFiles <- list.files("resources/Text Files")
@@ -274,3 +276,6 @@ print(paste0(theSource,"4"))
   gc()
   }  
 }
+
+Rprof()
+summaryRprof(profile_out)
