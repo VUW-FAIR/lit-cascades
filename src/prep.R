@@ -256,7 +256,7 @@ print(paste0(theSource,"3"))
     colnames(socEdges) <- c("id1", "id2", "label")
     h <- igraph::graph.data.frame(socEdges, directed = F)
 print(paste0(theSource,"3.5"))
-igraph::E(h)$weight <- E(h)$label
+igraph::E(h)$weight <- igraph::E(h)$label
     netm <- igraph::as_adjacency_matrix(h, attr = "weight", sparse = F)
 print(paste0(theSource,"3.7"))
     colnames(netm) <- igraph::V(h)$name
