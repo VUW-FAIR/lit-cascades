@@ -187,6 +187,9 @@ for(sliceSize in list("sentence")){
     
     tic <- tic_generate(charDS)
     
+    rm(charDS)
+    gc()
+    
 ## Extracting nodes, links, roots from network model computed in tic_generate.
     nodes <- data.frame(node_id = unlist(tic[[1]][,1]), tags = unlist(tic[[1]][,2]),
                         dpub = unlist(tic[[1]][,3]), stringsAsFactors = F)
@@ -280,6 +283,14 @@ print(paste0(theSource,"4"))
   rm(links)
   rm(nodes)
   rm(roots)
+  rm(convLinks)
+  rm(g)
+  rm(h)
+  rm(netm)
+  rm(SocN1)
+  rm(tic)
+  rm(uniqueLinks)
+  rm(wtc)
   gc()
   }  
 }
