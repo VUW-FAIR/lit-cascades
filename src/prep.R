@@ -144,7 +144,7 @@ for(sliceSize in list("sentence")){
             annotation <- coreNLP::annotateString(xx)
             tokens <- coreNLP::getToken(annotation)
             Deps <- coreNLP::getDependency(annotation, type = "basic")
-            Coref <- coreNLP::getCoreference(annotation)
+            #Coref <- coreNLP::getCoreference(annotation)
             neg_deps <- Deps[Deps$type == "neg",]$governor
             advs <- tokens[tokens$POS == "JJ",c("lemma","token")]
             if(allwords){
@@ -158,6 +158,12 @@ for(sliceSize in list("sentence")){
             ## Replacing lemmatised word with token word to allow for matching of negative dependencies
             traitwords_out[which(traitwords_out == advs$lemma)] <- advs$token[which(advs$lemma == traitwords_out)]
             traitwords_out[which(traitwords_out %in% neg_deps)] <- paste0("#-",traitwords_out[which(traitwords_out %in% neg_deps)])
+            rm(annotation)
+            rm(tokens)
+            rm(Deps)
+            rm(neg_deps)
+            rm(advs)
+            gc()
             traitwords_out
             
           }, warning = function(warning_condition) {}, error = function(error_condition) {}, finally={})
