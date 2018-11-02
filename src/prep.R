@@ -22,7 +22,7 @@
 #set working directoy
 setwd(here::here())
 
-Rprof(profile_out <- "profile.txt")
+#Rprof(profile_out <- "profile.txt")
 
 #import libs
 #coreNLP::initCoreNLP()
@@ -277,5 +277,5 @@ print(paste0(theSource,"4"))
   }  
 }
 
-Rprof()
-summaryRprof(profile_out)
+#Rprof()
+#summaryRprof(profile_out)
