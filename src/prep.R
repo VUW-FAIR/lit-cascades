@@ -1,4 +1,5 @@
-# Preprocessing script for a tool prototype that enables close and distant reading of literature.
+# Preprocessing script for a tool prototype that enables analysis capable of identifying salient psychological and narrative 
+# dimensions associated with cultural values, personality, emotions and morality in texts
 # For demonstration purposes the tool is configured to work on various Victorian Novels from Charles Dickens and other authors.
 # Authors: Markus Luczak-Roesch, Tom Goldfinch, Johannes A. Karl
 
@@ -25,7 +26,7 @@ setwd(here::here())
 #Rprof(profile_out <- "profile.txt")
 
 #import libs
-#coreNLP::initCoreNLP()
+#coreNLP::initCoreNLP(type = c("english"),mem="64g")
 
   #housekeeping and helpers
 options(scipen = 999)
