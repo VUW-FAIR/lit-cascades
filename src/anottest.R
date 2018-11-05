@@ -22,6 +22,7 @@ library(rJava)
 #housekeeping and helpers
 options(scipen = 999)
 
+neg <- c("not", "never", "scarcely", "seldom", "barely", "rarely", "infrequently")
 # Functions ---------------------------------------------------------------
 
 
