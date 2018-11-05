@@ -38,8 +38,17 @@ link <- lapply(alllinks, function(x) read.table(x, header = T, check.names = F,
 for(bb in 1:length(cooc)){
   rownames(cooc[[bb]]) <- cooc[[bb]][,1]
   cooc[[bb]][,1] <- NULL
-  cooc[[bb]] <- cooc[[bb]][-which(rowSums(cooc[[bb]]) <= ceiling(max(rowSums(cooc[[bb]])) * .10)),
-                           -which(colSums(cooc[[bb]]) <= ceiling(max(colSums(cooc[[bb]])) * .10))]
+  
+  # rare co-occurring terms
+  rareT <- which(rowSums(cooc[[bb]]) <= ceiling(max(rowSums(cooc[[bb]])) * .10))
+  # frequent co-occ terms
+  freqT <- which(rowSums(cooc[[bb]]) > ceiling(max(rowSums(cooc[[bb]])) * .10))
+  # rare terms only co-occurring with rare terms
+  finalRare <- which(colSums(cooc[[bb]][freqT,]) == 0)
+  
+  cooc[[bb]] <- cooc[[bb]][-finalRare,-finalRare]
+  #cooc[[bb]] <- cooc[[bb]][-which(rowSums(cooc[[bb]]) < ceiling(max(rowSums(cooc[[bb]])) * .10)),
+  #                         -which(colSums(cooc[[bb]]) < ceiling(max(colSums(cooc[[bb]])) * .10))]
   
 }
 
@@ -49,6 +58,9 @@ for(sent in cooc){
 
   test <- Rtsne::Rtsne(sent,check_duplicates=FALSE,
                      pca=TRUE, perplexity = 2, theta=0.5, dims=2)
+  
+  plot(test$Y)
+  text(test$Y, labels=rownames(sent))
   
   tsn_list[[length(tsn_list) + 1]] <- test
   names_list[[length(names_list) + 1]] <- rownames(sent)
