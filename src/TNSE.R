@@ -30,11 +30,26 @@ alllinks <- list.files(paste0("resources/output/", "sentence", "/"),
                             pattern = "(.*)_links.csv",
                             full.names = T)
 
+allnodess <- list.files(paste0("resources/output/", "sentence", "/"),
+                       pattern = "(.*)_nodes.csv",
+                       full.names = T)
+
 
 ## Fetching the data of the co-ocurrence matrices
 cooc <- lapply(allmatrices, function(x) read.table(x, header = T, check.names = F))
 link <- lapply(alllinks, function(x) read.table(x, header = T, check.names = F,
                                                 stringsAsFactors = F))
+# testing some recurrence network analysis
+g <- igraph::graph_from_data_frame(link[[1]])
+igraph::E(g)$weight <- link[[1]]$target-link[[1]]$source
+g_mat <- igraph::as_adjacency_matrix(g, sparse = F, attr = "weight")
+test <- Rtsne::Rtsne(g_mat,check_duplicates=FALSE,
+                     pca=TRUE, perplexity = 2, theta=0.5, dims=2)
+plot(test$Y)
+text(test$Y, labels=rownames(g_mat))
+
+
+
 for(bb in 1:length(cooc)){
   rownames(cooc[[bb]]) <- cooc[[bb]][,1]
   cooc[[bb]][,1] <- NULL
