@@ -144,3 +144,12 @@ rf.cluster = cutree(hclust.rf, k=3)
 metricsgraphics::mjs_plot(rf.cluster, x=PC1, y=PC2) %>%
   metricsgraphics::mjs_point(color_accessor=rf.clusters) %>%
   metricsgraphics::mjs_labs(x="principal comp 1", y="principal comp 2")
+
+
+#model based example
+library(mclust)
+fit <- mclust::Mclust(cooc[[1]])
+plot(fit) # plot results 
+summary(fit) # display the best model
+#evaluate cluster solutions
+#cluster.stats(cooc[[1]], fit1$cluster, fit2$cluster)
