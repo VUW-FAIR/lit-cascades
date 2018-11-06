@@ -280,6 +280,7 @@ termFeaturesNodes <- cbind(aggregate(entropy ~ terms,nodeFeatures,FUN = function
                            aggregate(density ~ terms,nodeFeatures,mean),
                            aggregate(modularity ~ terms,nodeFeatures,mean))
 termFeaturesNodes$entropy[which(is.nan(termFeaturesNodes$entropy))] <- 0
+termFeaturesNodes <- sort(termFeaturesNodes$terms)
 
 ktmp <- kmeans(termFeaturesNodes[-c(1,3,5,7,9)],5)
 foo <- termFeaturesNodes[-c(1,3,5,7,9)]
@@ -306,8 +307,11 @@ coNOTrec <- rownames(cooc[[1]])[-which(rownames(cooc[[1]]) %in% linkFeatures$tag
 #what does recur and co-occur
 corec <- rownames(cooc[[1]])[which(rownames(cooc[[1]]) %in% linkFeatures$tag)]
 
+#what does occur but neither recur nor co-occur
+occ <- termFeaturesNodes$terms[which(!termFeaturesNodes$terms %in% fusedTerms$terms)]
+
 #all terms
-fusedTerms <- as.data.frame(sort(unique(c(recNOTco,coNOTrec,corec))),stringsAsFactors = F)
+fusedTerms <- as.data.frame(sort(unique(c(recNOTco,coNOTrec,corec,occ))),stringsAsFactors = F)
 colnames(fusedTerms) <- c("terms")
 rownames(fusedTerms) <- fusedTerms$terms
 fusedTerms$coocs <- 0
@@ -331,8 +335,10 @@ fusedTerms[recNOTco,4] <- linkFeatures[recNOTco,4]
 fusedTerms[corec,5] <- linkFeatures[corec,2]
 fusedTerms[recNOTco,5] <- linkFeatures[recNOTco,2]
 
-ktmp <- kmeans(fusedTerms[-c(1:3)],5)
-foo <- fusedTerms[-c(1:3)]
+structuralFeatures <- cbind(fusedTerms,termFeaturesNodes)
+
+ktmp <- kmeans(structuralFeatures[-c(1,2,3,7,9,11,13,15)],5)
+foo <- structuralFeatures[-c(1,2,3,7,9,11,13,15)]
 PCA <-prcomp(foo)$x
 plot(PCA, col=ktmp$cluster)
 text(x=PCA[,1], y=PCA[,2], cex=0.6, pos=4, labels=(row.names(foo)))
