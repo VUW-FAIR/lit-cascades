@@ -251,6 +251,32 @@ write.table(cbind(coordinates, wien, struct),
             file=paste0("resources/output/", sliceSize, "/", theSource,
                         "_temporal_statistics.csv"), row.names = F, col.names = F, sep = ";")
 
+nodeFeatures <- as.data.frame(cbind(node[[1]]$title,wien,struct[,c(2,3)]),stringsAsFactors = F)
+nodeFeatures$order <- rownames(nodeFeatures)
+colnames(nodeFeatures) <- c("terms","entropy","evenness","richness","density","modularity","order")
+nodeFeatures <- nodeFeatures[which(nodeFeatures$terms!=""),]
+for(i in 1:nrow(nodeFeatures)){
+  if(length(unlist(strsplit(nodeFeatures$terms[i],", "))) > 1){
+    nextTerms <- unlist(strsplit(nodeFeatures$terms[i],", "))
+    nodeFeatures$terms[i] <- nextTerms[1]
+    print(i)
+    print(nextTerms[1])
+    for(j in 2:length(nextTerms)){
+      nodeFeatures <- rbind(nodeFeatures,data.frame(terms=nextTerms[j],entropy=nodeFeatures$entropy[i],evenness=nodeFeatures$evenness[i],richness=nodeFeatures$richness[i],density=nodeFeatures$density[i],modularity=nodeFeatures$modularity[i],order=nodeFeatures$order[i]))
+    }
+  }
+}
+nodeFeatures$order <- as.numeric(nodeFeatures$order)
+nodeFeatures$entropy <- as.numeric(nodeFeatures$entropy)
+nodeFeatures$evenness <- as.numeric(nodeFeatures$evenness)
+nodeFeatures$richness <- as.numeric(nodeFeatures$richness)
+nodeFeatures$density <- as.numeric(nodeFeatures$density)
+nodeFeatures$modularity <- as.numeric(nodeFeatures$modularity)
+nodeFeatures <- nodeFeatures[order(nodeFeatures$order),]
+
+termFeaturesNodes <- cbind(aggregate(entropy ~ terms,nodeFeatures,FUN = function(x){mean(diff(x))}))
+termFeaturesNodes$entropy[which(is.nan(termFeaturesNodes$entropy))] <- 0
+
 # further analysis tests
 
 link[[1]]$dist <- link[[1]]$target-link[[1]]$source
