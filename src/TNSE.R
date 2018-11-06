@@ -21,15 +21,64 @@ plot_cluster <- function(data, var_cluster, palette)
 }
 
 #evaluate kmeans cluster quality
-kmIC = function(fit){
+kmIC <-  function(fit){
   
   m = ncol(fit$centers)
   n = length(fit$cluster)
   k = nrow(fit$centers)
   D = fit$tot.withinss
-  return(data.frame(AIC = D + 2*m*k,
-                    BIC = D + log(n)*m*k))
+  return(data.frame(AIC = D + 2 * m * k,
+                    BIC = D + log(n) * m * k))
 }
+
+
+
+tsne_plotting <- function(tsn_list, percent = .05){
+  
+  for(number in 1:length(tsn_list)){
+    d_tsne_1 <- as.data.frame(tsn_list[[number]]$Y) 
+    d_tsne_1 <- cbind(d_tsne_1, rowname = names_list[[number]]) 
+    
+    rng <- 2:20 #K from 2 to 20
+    tries <- 1000 #Run the K Means algorithm 100 times 
+    avg.totw.ss <- integer(length(rng)) #Set up an empty vector to hold all of points 
+    avgkIC <- double(length(rng))
+    
+    for(v in rng){ # For each value of the range variable
+      v.totw.ss <- integer(tries) #Set up an empty vector to hold the 100 tries
+      tmpkIC <- double(tries)
+      for(i in 1:tries){
+        k.temp <- kmeans(d_tsne_1[-3], centers = v) #Run kmeans
+        v.totw.ss[i] <- k.temp$tot.withinss#Store the total withinss
+        tmpkIC[i]  <- kmIC(k.temp)$BIC
+      }
+      avg.totw.ss[v-1] <- mean(v.totw.ss) #Average the 100 total withinss 
+      avgkIC[v-1] <-mean(tmpkIC) 
+    }
+    components_number <-  sum(abs(diff(avg.totw.ss)) >= (max(abs(diff(avg.totw.ss))) * percent))
+    
+    ## keeping original data
+    d_tsne_1_original <-  d_tsne_1
+    
+    ## Creating k-means clustering model, and assigning the result to the data used to create the tsne
+    fit_cluster_kmeans <-  kmeans(scale(d_tsne_1[-3]), components_number)  
+    d_tsne_1_original$cl_kmeans <- factor(fit_cluster_kmeans$cluster)
+    
+    ## Creating hierarchical cluster model, and assigning the result to the data used to create the tsne
+    fit_cluster_hierarchical <- hclust(dist(scale(d_tsne_1[-3])))
+    
+    ## setting 3 clusters as output
+    d_tsne_1_original$cl_hierarchical <-  factor(cutree(fit_cluster_hierarchical, k = components_number)) 
+    
+    plot_k <- plot_cluster(d_tsne_1_original, "cl_kmeans", "Accent")  
+    plot_h <- plot_cluster(d_tsne_1_original, "cl_hierarchical", "Set1")
+    
+    ## and finally: putting the plots side by side with gridExtra lib...
+    grid.arrange(plot_k, plot_h,  ncol = 2)
+    
+  }
+}
+# Start of the Code -------------------------------------------------------
 
 
 ## Creating a list with all co-ocurrence matrices for all outputs
@@ -85,48 +134,7 @@ for(sent in cooc){
 }
 
 
-for(number in 1:length(tsn_list)){
-  d_tsne_1 <- as.data.frame(tsn_list[[number]]$Y) 
-  d_tsne_1 <- cbind(d_tsne_1, rowname = names_list[[number]]) 
-   
-  rng<-2:20 #K from 2 to 20
-  tries <-1000 #Run the K Means algorithm 100 times 
-  avg.totw.ss <-integer(length(rng)) #Set up an empty vector to hold all of points 
-  avgkIC <-double(length(rng))
-  for(v in rng){ # For each value of the range variable
-     v.totw.ss <-integer(tries) #Set up an empty vector to hold the 100 tries
-     tmpkIC <-double(tries)
-     for(i in 1:tries){
-       k.temp <-kmeans(d_tsne_1[-3],centers=v) #Run kmeans
-       v.totw.ss[i] <-k.temp$tot.withinss#Store the total withinss
-       tmpkIC[i]  <- kmIC(k.temp)$BIC
-     }
-     avg.totw.ss[v-1] <-mean(v.totw.ss) #Average the 100 total withinss 
-     avgkIC[v-1] <-mean(tmpkIC) 
-  }
-  components_number <-  sum(abs(diff(avg.totw.ss)) >= (max(abs(diff(avg.totw.ss))) * .05))
-  
-  ## keeping original data
-  d_tsne_1_original = d_tsne_1
-  
-  ## Creating k-means clustering model, and assigning the result to the data used to create the tsne
-  fit_cluster_kmeans = kmeans(scale(d_tsne_1[-3]), components_number)  
-  d_tsne_1_original$cl_kmeans = factor(fit_cluster_kmeans$cluster)
-  
-  ## Creating hierarchical cluster model, and assigning the result to the data used to create the tsne
-  fit_cluster_hierarchical=hclust(dist(scale(d_tsne_1[-3])))
-  
-  ## setting 3 clusters as output
-  d_tsne_1_original$cl_hierarchical = factor(cutree(fit_cluster_hierarchical,
-                                                    k = components_number)) 
-  
-  plot_k=plot_cluster(d_tsne_1_original, "cl_kmeans", "Accent")  
-  plot_h=plot_cluster(d_tsne_1_original, "cl_hierarchical", "Set1")
-  
-  ## and finally: putting the plots side by side with gridExtra lib...
-  grid.arrange(plot_k, plot_h,  ncol=2)
-
-}
+tsne_plotting(tsn_list)
 
 #random forest example
 
