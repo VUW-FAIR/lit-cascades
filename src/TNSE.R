@@ -80,7 +80,7 @@ tsne_plotting <- function(tsn_list, percent = .05){
 }
 
 
-structuralFeatures <- function(nodes, links){
+structuralFeatures <- function(book, nodes, links){
   ## additional TIC features - testing
   casc <- c()
   inter <- c()
@@ -174,7 +174,7 @@ structuralFeatures <- function(nodes, links){
   }
   
   write.table(cbind(coordinates, wien, struct),
-              file=paste0("resources/output/", sliceSize, "/", theSource,
+              file=paste0("resources/output/post/", book,
                           "_temporal_statistics.csv"), row.names = F, col.names = F, sep = ";")
   
   nodeFeatures <- as.data.frame(cbind(nodes$title,wien,struct[,c(2,3)]),stringsAsFactors = F)
@@ -333,7 +333,7 @@ tsne_plotting(tsn_list)
 
 # structural feature analysis
 for(nextBook in 1:length(link)){
-  structuralFeatures(node[[nextBook]],link[[nextBook]])
+  structuralFeatures(gsub("resources/output/sentence//|\\.csv","",alllinks[[nextBook]]),node[[nextBook]],link[[nextBook]])
 }
 
 #random forest example
