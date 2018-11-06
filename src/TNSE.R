@@ -274,8 +274,21 @@ nodeFeatures$density <- as.numeric(nodeFeatures$density)
 nodeFeatures$modularity <- as.numeric(nodeFeatures$modularity)
 nodeFeatures <- nodeFeatures[order(nodeFeatures$order),]
 
-termFeaturesNodes <- cbind(aggregate(entropy ~ terms,nodeFeatures,FUN = function(x){mean(diff(x))}))
+termFeaturesNodes <- cbind(aggregate(entropy ~ terms,nodeFeatures,FUN = function(x){mean(diff(x))}),
+                           aggregate(evenness ~ terms,nodeFeatures,mean),
+                           aggregate(richness ~ terms,nodeFeatures,mean),
+                           aggregate(density ~ terms,nodeFeatures,mean),
+                           aggregate(modularity ~ terms,nodeFeatures,mean))
 termFeaturesNodes$entropy[which(is.nan(termFeaturesNodes$entropy))] <- 0
+
+ktmp <- kmeans(termFeaturesNodes[-c(1,3,5,7,9)],5)
+foo <- termFeaturesNodes[-c(1,3,5,7,9)]
+plot(PCA, col=ktmp$cluster)
+text(x=PCA[,1], y=PCA[,2], cex=0.6, pos=4, labels=(termFeaturesNodes$terms))
+plot(PCA[,2],PCA[,3], col=ktmp$cluster)
+text(x=PCA[,2], y=PCA[,3], cex=0.6, pos=4, labels=(termFeaturesNodes$terms))
+plot(PCA[,1],PCA[,3], col=ktmp$cluster)
+text(x=PCA[,1], y=PCA[,3], cex=0.6, pos=4, labels=(termFeaturesNodes$terms))
 
 # further analysis tests
 
