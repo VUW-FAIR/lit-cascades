@@ -90,6 +90,17 @@ fusedTerms[recNOTco,4] <- linkFeatures[recNOTco,4]
 fusedTerms[corec,5] <- linkFeatures[corec,2]
 fusedTerms[recNOTco,5] <- linkFeatures[recNOTco,2]
 
+ktmp <- kmeans(fusedTerms[-c(1:3)],5)
+foo <- fusedTerms[-c(1:3)]
+PCA <-prcomp(foo)$x
+plot(PCA, col=ktmp$cluster)
+text(x=PCA[,1], y=PCA[,2], cex=0.6, pos=4, labels=(row.names(foo)))
+plot(PCA[,2],PCA[,3], col=ktmp$cluster)
+text(x=PCA[,2], y=PCA[,3], cex=0.6, pos=4, labels=(row.names(foo)))
+plot(PCA[,1],PCA[,3], col=ktmp$cluster)
+text(x=PCA[,1], y=PCA[,3], cex=0.6, pos=4, labels=(row.names(foo)))
+
+
 # testing some recurrence network analysis
 g <- igraph::graph_from_data_frame(link[[1]])
 igraph::E(g)$weight <- link[[1]]$target-link[[1]]$source
