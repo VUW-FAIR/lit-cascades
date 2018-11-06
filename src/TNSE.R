@@ -152,8 +152,8 @@ casc <- c()
 inter <- c()
 ent <- data.frame(ww = numeric(0), xx = numeric(0), yy = numeric(0), zz = numeric(0))
 wien <- c()
-colnames(links) <- c('source', 'target', 'tag')
-
+colnames(link[[1]]) <- c('source', 'target', 'tag')
+colnames(node[[1]]) <- c('id','title','label')
 coordinates <- c()
 spec <- list()
 div = 1
@@ -161,8 +161,8 @@ div = 1
 g1 <- igraph::make_empty_graph(n = 0, directed = TRUE)
 struct <- c()
 props <- c()
-for(z in 1:nrow(nodes)){
-  if(nodes[z,]$title == ""){
+for(z in 1:nrow(node[[1]])){
+  if(node[[1]][z,]$title == ""){
     if(nrow(ent) > 0){
       ent <- rbind(ent, ent[nrow(ent),])
       wien <- rbind(wien, wien[nrow(wien),])
@@ -171,23 +171,23 @@ for(z in 1:nrow(nodes)){
       ent <- rbind(ent, c(0, 1, 0, 1))
       wien <- rbind(wien, c(0, 1, 1))
     }
-    coordinates <- rbind(coordinates, c(as.numeric(nodes[z, 1]), 0, 0))
+    coordinates <- rbind(coordinates, c(as.numeric(node[[1]][z, 1]), 0, 0))
     
   }else{
-    inter <- rbind(inter, paste(sort(unlist(strsplit(nodes[z,2],', '))), collapse = ', '))
-    nextI <- digest(paste(sort(unlist(strsplit(nodes[z,2], ', '))), collapse = ', '), algo = "md5")
+    inter <- rbind(inter, paste(sort(unlist(strsplit(node[[1]][z,2],', '))), collapse = ', '))
+    nextI <- digest::digest(paste(sort(unlist(strsplit(node[[1]][z,2], ', '))), collapse = ', '), algo = "md5")
     if(length(spec) == 0){
-      coordinates <- rbind(coordinates, c(as.numeric(nodes[z, 1]), 1, 1))
+      coordinates <- rbind(coordinates, c(as.numeric(node[[1]][z, 1]), 1, 1))
       spec[[nextI]] <- c(1, 1)
     }
     else{
       if(is.null(spec[[nextI]])){
         spec[[nextI]] <- c(1,div)
-        coordinates <- rbind(coordinates,c(as.numeric(nodes[z,1]),spec[[nextI]][1],div))
+        coordinates <- rbind(coordinates,c(as.numeric(node[[1]][z,1]),spec[[nextI]][1],div))
         div <- div+1
       }else{
         spec[[nextI]] <- c(spec[[nextI]][1]+1,spec[[nextI]][2])
-        coordinates <- rbind(coordinates,c(as.numeric(nodes[z,1]),spec[[nextI]][1],spec[[nextI]][2]))
+        coordinates <- rbind(coordinates,c(as.numeric(node[[1]][z,1]),spec[[nextI]][1],spec[[nextI]][2]))
       }
     }
     
@@ -207,9 +207,9 @@ for(z in 1:nrow(nodes)){
     df$loga <- log(tmp)
     df$piloga <- tmp * log(tmp)
     if(is.nan((-1 * (colSums(df)[3])) / log(nrow(df)))){
-      ent <- rbind(ent,c(entropy.empirical(df[,1], unit = "log2"), 1, -1 * (colSums(df)[3]), 1))
+      ent <- rbind(ent,c(entropy::entropy.empirical(df[,1], unit = "log2"), 1, -1 * (colSums(df)[3]), 1))
     } else{
-      ent <- rbind(ent, c(entropy.empirical(df[,1], unit = "log2"), (-1 * (colSums(df)[3])) / log2(nrow(df)),-1*(colSums(df)[3]),(-1*(colSums(df)[3]))/log(nrow(df))))
+      ent <- rbind(ent, c(entropy::entropy.empirical(df[,1], unit = "log2"), (-1 * (colSums(df)[3])) / log2(nrow(df)),-1*(colSums(df)[3]),(-1*(colSums(df)[3]))/log(nrow(df))))
     }
     
     if(nrow(df) == 1){
@@ -226,12 +226,12 @@ for(z in 1:nrow(nodes)){
   colnames(wien)<-c('ShannonWiener', 'Pielou', 'Richness')
   
   #add node
-  g1 <- igraph::add_vertices(g1,1,attr = list(id = as.numeric(nodes[z,1])))
+  g1 <- igraph::add_vertices(g1,1,attr = list(id = as.numeric(node[[1]][z,1])))
   
   #add all links to node
-  theLinks <- unique(links[which(links[,2] == nodes[z,1]),1:2])
+  theLinks <- unique(link[[1]][which(link[[1]][,2] == node[[1]][z,1]),1:2])
   for(srclnk in theLinks[,1]){
-    g1 <- igraph::add_edges(g1, c(which(V(g1)$id == srclnk), which(V(g1)$id == as.numeric(nodes[z,1]))))
+    g1 <- igraph::add_edges(g1, c(which(igraph::V(g1)$id == srclnk), which(igraph::V(g1)$id == as.numeric(node[[1]][z,1]))))
   }
   
   #degd <- degree.distribution(g1)
