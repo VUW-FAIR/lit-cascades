@@ -50,6 +50,46 @@ allnodess <- list.files(paste0("resources/output/", "sentence", "/"),
 cooc <- lapply(allmatrices, function(x) read.table(x, header = T, check.names = F))
 link <- lapply(alllinks, function(x) read.table(x, header = T, check.names = F,
                                                 stringsAsFactors = F))
+
+link[[1]]$dist <- link[[1]]$target-link[[1]]$source
+link[[1]]$hlp <- 1
+linkFeatures <- cbind(aggregate(dist ~ tag,link[[1]],mean),aggregate(hlp ~ tag,link[[1]],sum))
+rownames(linkFeatures) <- linkFeatures$tag
+
+# what recurrs but what does not co-occur
+recNOTco <- linkFeatures$tag[-which(linkFeatures$tag %in% rownames(cooc[[1]]))]
+
+# what co-occurs but doesn't recur
+coNOTrec <- rownames(cooc[[1]])[-which(rownames(cooc[[1]]) %in% linkFeatures$tag)]
+
+#what does recur and co-occur
+corec <- rownames(cooc[[1]])[which(rownames(cooc[[1]]) %in% linkFeatures$tag)]
+
+#all terms
+fusedTerms <- as.data.frame(sort(unique(c(recNOTco,coNOTrec,corec))),stringsAsFactors = F)
+colnames(fusedTerms) <- c("terms")
+rownames(fusedTerms) <- fusedTerms$terms
+fusedTerms$coocs <- 0
+fusedTerms$distcoocs <- 0
+fusedTerms$recs <- 0
+fusedTerms$distrecs <- 0
+
+#co-occ featrues
+fusedTerms[coNOTrec,2] <- colSums(cooc[[1]][coNOTrec])
+fusedTerms[corec,2] <- colSums(cooc[[1]][corec])
+
+fusedTerms[coNOTrec,3] <- colSums(cooc[[1]][coNOTrec] > 0)
+fusedTerms[corec,3] <- colSums(cooc[[1]][corec] > 0)
+
+fusedTerms$coocProp <- 0
+fusedTerms[which(fusedTerms$coocs>0),6] <- fusedTerms[which(fusedTerms$coocs>0),3] / fusedTerms[which(fusedTerms$coocs>0),2]
+
+fusedTerms[corec,4] <- linkFeatures[corec,4]
+fusedTerms[recNOTco,4] <- linkFeatures[recNOTco,4]
+
+fusedTerms[corec,5] <- linkFeatures[corec,2]
+fusedTerms[recNOTco,5] <- linkFeatures[recNOTco,2]
+
 # testing some recurrence network analysis
 g <- igraph::graph_from_data_frame(link[[1]])
 igraph::E(g)$weight <- link[[1]]$target-link[[1]]$source
