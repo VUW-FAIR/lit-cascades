@@ -80,8 +80,11 @@ tsne_plotting <- function(tsn_list, percent = .05){
 }
 
 
-structuralFeatures <- function(book, nodes, links){
-  ## additional TIC features - testing
+structuralFeatures <- function(book, nodes, links, cooc){
+  
+  rownames(cooc) <- cooc[,1]
+  cooc[,1] <- NULL
+  
   casc <- c()
   inter <- c()
   ent <- data.frame(ww = numeric(0), xx = numeric(0), yy = numeric(0), zz = numeric(0))
@@ -185,13 +188,12 @@ structuralFeatures <- function(book, nodes, links){
     if(length(unlist(strsplit(nodeFeatures$terms[i],", "))) > 1){
       nextTerms <- unlist(strsplit(nodeFeatures$terms[i],", "))
       nodeFeatures$terms[i] <- nextTerms[1]
-      print(i)
-      print(nextTerms[1])
       for(j in 2:length(nextTerms)){
         nodeFeatures <- rbind(nodeFeatures,data.frame(terms=nextTerms[j],entropy=nodeFeatures$entropy[i],evenness=nodeFeatures$evenness[i],richness=nodeFeatures$richness[i],density=nodeFeatures$density[i],modularity=nodeFeatures$modularity[i],order=nodeFeatures$order[i]))
       }
     }
   }
+  
   nodeFeatures$order <- as.numeric(nodeFeatures$order)
   nodeFeatures$entropy <- as.numeric(nodeFeatures$entropy)
   nodeFeatures$evenness <- as.numeric(nodeFeatures$evenness)
@@ -206,15 +208,16 @@ structuralFeatures <- function(book, nodes, links){
                              aggregate(density ~ terms,nodeFeatures,mean),
                              aggregate(modularity ~ terms,nodeFeatures,mean))
   termFeaturesNodes$entropy[which(is.nan(termFeaturesNodes$entropy))] <- 0
-  termFeaturesNodes <- sort(termFeaturesNodes$terms)
+  termFeaturesNodes <- termFeaturesNodes[with(termFeaturesNodes, order(terms)), ]
   
-  ktmp <- kmeans(termFeaturesNodes[-c(1,3,5,7,9)],5)
+  ktmp <- kmeans(termFeaturesNodes[,-c(1,3,5,7,9)],5)
   foo <- termFeaturesNodes[-c(1,3,5,7,9)]
-  plot(PCA, col=ktmp$cluster)
+  PCA <-prcomp(foo)$x
+  plot(PCA, col=ktmp$cluster,pch=20,main = paste0("Node features ",book))
   text(x=PCA[,1], y=PCA[,2], cex=0.6, pos=4, labels=(termFeaturesNodes$terms))
-  plot(PCA[,2],PCA[,3], col=ktmp$cluster)
+  plot(PCA[,2],PCA[,3], col=ktmp$cluster,pch=20,main = paste0("Node features ",book))
   text(x=PCA[,2], y=PCA[,3], cex=0.6, pos=4, labels=(termFeaturesNodes$terms))
-  plot(PCA[,1],PCA[,3], col=ktmp$cluster)
+  plot(PCA[,1],PCA[,3], col=ktmp$cluster,pch=20,main = paste0("Node features ",book))
   text(x=PCA[,1], y=PCA[,3], cex=0.6, pos=4, labels=(termFeaturesNodes$terms))
   
   # further analysis tests
@@ -225,20 +228,24 @@ structuralFeatures <- function(book, nodes, links){
   rownames(linkFeatures) <- linkFeatures$tag
   
   # what recurrs but what does not co-occur
-  recNOTco <- linkFeatures$tag[-which(linkFeatures$tag %in% rownames(cooc[[1]]))]
+  recNOTco <- linkFeatures$tag[-which(linkFeatures$tag %in% rownames(cooc))]
   
   # what co-occurs but doesn't recur
-  coNOTrec <- rownames(cooc[[1]])[-which(rownames(cooc[[1]]) %in% linkFeatures$tag)]
+  coNOTrec <- rownames(cooc)[-which(rownames(cooc) %in% linkFeatures$tag)]
   
   #what does recur and co-occur
-  corec <- rownames(cooc[[1]])[which(rownames(cooc[[1]]) %in% linkFeatures$tag)]
-  
-  #what does occur but neither recur nor co-occur
-  occ <- termFeaturesNodes$terms[which(!termFeaturesNodes$terms %in% fusedTerms$terms)]
+  corec <- rownames(cooc)[which(rownames(cooc) %in% linkFeatures$tag)]
   
   #all terms
-  fusedTerms <- as.data.frame(sort(unique(c(recNOTco,coNOTrec,corec,occ))),stringsAsFactors = F)
+  fusedTerms <- as.data.frame(sort(unique(c(recNOTco,coNOTrec,corec))),stringsAsFactors = F)
   colnames(fusedTerms) <- c("terms")
+  
+  #what does occur but neither recur nor co-occur
+  occ <- as.data.frame(unique(termFeaturesNodes$terms[which(!termFeaturesNodes$terms %in% fusedTerms$terms)]),stringsAsFactors = F)
+  colnames(occ) <- c("terms")
+  fusedTerms <- rbind(fusedTerms,occ)
+  fusedTerms$terms <- sort(fusedTerms$terms)
+  
   rownames(fusedTerms) <- fusedTerms$terms
   fusedTerms$coocs <- 0
   fusedTerms$distcoocs <- 0
@@ -246,11 +253,11 @@ structuralFeatures <- function(book, nodes, links){
   fusedTerms$distrecs <- 0
   
   #co-occ featrues
-  fusedTerms[coNOTrec,2] <- colSums(cooc[[1]][coNOTrec])
-  fusedTerms[corec,2] <- colSums(cooc[[1]][corec])
+  fusedTerms[coNOTrec,2] <- colSums(cooc[coNOTrec])
+  fusedTerms[corec,2] <- colSums(cooc[corec])
   
-  fusedTerms[coNOTrec,3] <- colSums(cooc[[1]][coNOTrec] > 0)
-  fusedTerms[corec,3] <- colSums(cooc[[1]][corec] > 0)
+  fusedTerms[coNOTrec,3] <- colSums(cooc[coNOTrec] > 0)
+  fusedTerms[corec,3] <- colSums(cooc[corec] > 0)
   
   fusedTerms$coocProp <- 0
   fusedTerms[which(fusedTerms$coocs>0),6] <- fusedTerms[which(fusedTerms$coocs>0),3] / fusedTerms[which(fusedTerms$coocs>0),2]
@@ -263,14 +270,14 @@ structuralFeatures <- function(book, nodes, links){
   
   structuralFeatures <- cbind(fusedTerms,termFeaturesNodes)
   
-  ktmp <- kmeans(structuralFeatures[-c(1,2,3,7,9,11,13,15)],5)
-  foo <- structuralFeatures[-c(1,2,3,7,9,11,13,15)]
+  ktmp <- kmeans(structuralFeatures[,-c(1,2,3,7,9,11,13,15)],5)
+  foo <- structuralFeatures[,-c(1,2,3,7,9,11,13,15)]
   PCA <-prcomp(foo)$x
-  plot(PCA, col=ktmp$cluster)
+  plot(PCA, col=ktmp$cluster,pch=20,main = paste0("Combined features ",book))
   text(x=PCA[,1], y=PCA[,2], cex=0.6, pos=4, labels=(row.names(foo)))
-  plot(PCA[,2],PCA[,3], col=ktmp$cluster)
+  plot(PCA[,2],PCA[,3], col=ktmp$cluster,pch=20,main = paste0("Combined features ",book))
   text(x=PCA[,2], y=PCA[,3], cex=0.6, pos=4, labels=(row.names(foo)))
-  plot(PCA[,1],PCA[,3], col=ktmp$cluster)
+  plot(PCA[,1],PCA[,3], col=ktmp$cluster,pch=20,main = paste0("Combined features ",book))
   text(x=PCA[,1], y=PCA[,3], cex=0.6, pos=4, labels=(row.names(foo)))
 }
 # Start of the Code -------------------------------------------------------
@@ -333,7 +340,7 @@ tsne_plotting(tsn_list)
 
 # structural feature analysis
 for(nextBook in 1:length(link)){
-  structuralFeatures(gsub("resources/output/sentence//|\\.csv","",alllinks[[nextBook]]),node[[nextBook]],link[[nextBook]])
+  structuralFeatures(gsub("resources/output/sentence//|\\_links.csv","",alllinks[[nextBook]]),node[[nextBook]],link[[nextBook]],cooc[[nextBook]])
 }
 
 #random forest example
