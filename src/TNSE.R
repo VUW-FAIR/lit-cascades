@@ -41,7 +41,7 @@ getClusterNumber <- function(dat, percent){
     v.totw.ss <- integer(tries) #Set up an empty vector to hold the 100 tries
     tmpkIC <- double(tries)
     for(i in 1:tries){
-      k.temp <- kmeans(dat, centers = v) #Run kmeans
+      k.temp <- kmeans(scale(dat), centers = v) #Run kmeans
       v.totw.ss[i] <- k.temp$tot.withinss#Store the total withinss
       tmpkIC[i]  <- kmIC(k.temp)$BIC
     }
@@ -60,24 +60,25 @@ tsne_plotting <- function(tsn_list, percent = .05){
     d_tsne_1 <- as.data.frame(tsn_list[[number]]$Y) 
     d_tsne_1 <- cbind(d_tsne_1, rowname = names_list[[number]]) 
     
-    components_number <- getClusterNumber(d_tsne_1[-3],percent)
+    #components_number <- getClusterNumber(d_tsne_1[-3],percent)
     
     ## keeping original data
     d_tsne_1_original <-  d_tsne_1
     
     ## Creating k-means clustering model, and assigning the result to the data used to create the tsne
-    print(components_number)
-    fit_cluster_kmeans <-  kmeans(scale(d_tsne_1[-3]), components_number)  
+    #print(components_number)
+    #fit_cluster_kmeans <-  kmeans(scale(d_tsne_1[-3]), components_number)  
+    fit_cluster_kmeans <- fpc::kmeansruns(scale(d_tsne_1[-3]),krange=2:12,critout=F,runs=2,criterion="ch")
     d_tsne_1_original$cl_kmeans <- factor(fit_cluster_kmeans$cluster)
     
     ## Creating hierarchical cluster model, and assigning the result to the data used to create the tsne
     fit_cluster_hierarchical <- hclust(dist(scale(d_tsne_1[-3])))
     
     ## setting 3 clusters as output
-    d_tsne_1_original$cl_hierarchical <-  factor(cutree(fit_cluster_hierarchical, k = components_number)) 
+    d_tsne_1_original$cl_hierarchical <-  factor(cutree(fit_cluster_hierarchical, k = fit_cluster_kmeans$bestk)) 
     
-    plot_k <- plot_cluster(d_tsne_1_original, "cl_kmeans", "Accent")  
-    plot_h <- plot_cluster(d_tsne_1_original, "cl_hierarchical", "Set1")
+    plot_k <- plot_cluster(d_tsne_1_original, "cl_kmeans", "Paired")  
+    plot_h <- plot_cluster(d_tsne_1_original, "cl_hierarchical", "Paired")
     
     ## and finally: putting the plots side by side with gridExtra lib...
     grid.arrange(plot_k, plot_h,  ncol = 2)
@@ -222,8 +223,22 @@ structuralFeatures <- function(book, nodes, links, cooc){
   termFeaturesNodes$entropy[which(is.nan(termFeaturesNodes$entropy))] <- 0
   termFeaturesNodes <- termFeaturesNodes[with(termFeaturesNodes, order(terms)), ]
   
-  ktmp <- kmeans(termFeaturesNodes[,-c(1,3,5,7,9)],getClusterNumber(termFeaturesNodes[,-c(1,3,5,7,9)], percent = .05))
-  foo <- termFeaturesNodes[-c(1,3,5,7,9)]
+  #ktmp <- kmeans(scale(termFeaturesNodes[,-c(1,3,5,7,9)]),getClusterNumber(termFeaturesNodes[,-c(1,3,5,7,9)], percent = .05))
+  #feature_perf <- c()
+  #ktmp <- fpc::kmeansruns(scale(termFeaturesNodes[,2]),krange=2:12,critout=F,runs=2,criterion="ch")
+  #feature_perf <- cbind(feature_perf,max(ktmp$crit))
+  #ktmp <- fpc::kmeansruns(scale(termFeaturesNodes[,4]),krange=2:12,critout=F,runs=2,criterion="ch")
+  #feature_perf <- cbind(feature_perf,max(ktmp$crit))
+  #ktmp <- fpc::kmeansruns(scale(termFeaturesNodes[,6]),krange=2:12,critout=F,runs=2,criterion="ch")
+  #feature_perf <- cbind(feature_perf,max(ktmp$crit))
+  #ktmp <- fpc::kmeansruns(scale(termFeaturesNodes[,8]),krange=2:12,critout=F,runs=2,criterion="ch")
+  #feature_perf <- cbind(feature_perf,max(ktmp$crit))
+  #ktmp <- fpc::kmeansruns(scale(termFeaturesNodes[,10]),krange=2:12,critout=F,runs=2,criterion="ch")
+  #feature_perf <- cbind(feature_perf,max(ktmp$crit))
+  #which(feature_perf == max(feature_perf))
+  
+  ktmp <- fpc::kmeansruns(scale(termFeaturesNodes[,-c(1,3,5,7,9)]),krange=2:12,critout=F,runs=2,criterion="ch")
+  foo <- scale(termFeaturesNodes[-c(1,3,5,7,9)])
   PCA <-prcomp(foo)$x
   plot(PCA, col=ktmp$cluster,pch=20,main = paste0("Node features ",book))
   text(x=PCA[,1], y=PCA[,2], cex=0.6, pos=4, labels=(termFeaturesNodes$terms))
@@ -286,8 +301,9 @@ structuralFeatures <- function(book, nodes, links, cooc){
   structuralFeatures <- cbind(fusedTerms,termFeaturesNodes)
   print(head(structuralFeatures))
   
-  ktmp <- kmeans(structuralFeatures[,-c(1,2,3,7,9,11,13,15)],getClusterNumber(structuralFeatures[,-c(1,2,3,7,9,11,13,15)], percent = .05))
-  foo <- structuralFeatures[,-c(1,2,3,7,9,11,13,15)]
+  #ktmp <- kmeans(scale(structuralFeatures[,-c(1,2,3,7,9,11,13,15)]),getClusterNumber(structuralFeatures[,-c(1,2,3,7,9,11,13,15)], percent = .05))
+  ktmp <- fpc::kmeansruns(scale(structuralFeatures[,-c(1,2,3,7,9,11,13,15)]),krange=2:12,critout=F,runs=2,criterion="ch")
+  foo <- scale(structuralFeatures[,-c(1,2,3,7,9,11,13,15)])
   PCA <-prcomp(foo)$x
   plot(PCA, col=ktmp$cluster,pch=20,main = paste0("Combined features ",book))
   text(x=PCA[,1], y=PCA[,2], cex=0.6, pos=4, labels=(row.names(foo)))
