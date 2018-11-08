@@ -31,6 +31,27 @@ kmIC <-  function(fit){
                     BIC = D + log(n) * m * k))
 }
 
+getClusterNumber <- function(dat, percent){
+  rng <- 2:12 #K from 2 to 20
+  tries <- 500 #Run the K Means algorithm 500 times 
+  avg.totw.ss <- integer(length(rng)) #Set up an empty vector to hold all of points 
+  avgkIC <- double(length(rng))
+  
+  for(v in rng){ # For each value of the range variable
+    v.totw.ss <- integer(tries) #Set up an empty vector to hold the 100 tries
+    tmpkIC <- double(tries)
+    for(i in 1:tries){
+      k.temp <- kmeans(dat, centers = v) #Run kmeans
+      v.totw.ss[i] <- k.temp$tot.withinss#Store the total withinss
+      tmpkIC[i]  <- kmIC(k.temp)$BIC
+    }
+    avg.totw.ss[v-1] <- mean(v.totw.ss) #Average the 100 total withinss 
+    avgkIC[v-1] <-mean(tmpkIC) 
+  }
+  components_number <-  sum(abs(diff(avg.totw.ss)) >= (max(abs(diff(avg.totw.ss))) * percent))
+  return(components_number)
+}
+
 
 
 tsne_plotting <- function(tsn_list, percent = .05){
@@ -39,28 +60,13 @@ tsne_plotting <- function(tsn_list, percent = .05){
     d_tsne_1 <- as.data.frame(tsn_list[[number]]$Y) 
     d_tsne_1 <- cbind(d_tsne_1, rowname = names_list[[number]]) 
     
-    rng <- 2:20 #K from 2 to 20
-    tries <- 1000 #Run the K Means algorithm 100 times 
-    avg.totw.ss <- integer(length(rng)) #Set up an empty vector to hold all of points 
-    avgkIC <- double(length(rng))
-    
-    for(v in rng){ # For each value of the range variable
-      v.totw.ss <- integer(tries) #Set up an empty vector to hold the 100 tries
-      tmpkIC <- double(tries)
-      for(i in 1:tries){
-        k.temp <- kmeans(d_tsne_1[-3], centers = v) #Run kmeans
-        v.totw.ss[i] <- k.temp$tot.withinss#Store the total withinss
-        tmpkIC[i]  <- kmIC(k.temp)$BIC
-      }
-      avg.totw.ss[v-1] <- mean(v.totw.ss) #Average the 100 total withinss 
-      avgkIC[v-1] <-mean(tmpkIC) 
-    }
-    components_number <-  sum(abs(diff(avg.totw.ss)) >= (max(abs(diff(avg.totw.ss))) * percent))
+    components_number <- getClusterNumber(d_tsne_1[-3],percent)
     
     ## keeping original data
     d_tsne_1_original <-  d_tsne_1
     
     ## Creating k-means clustering model, and assigning the result to the data used to create the tsne
+    print(components_number)
     fit_cluster_kmeans <-  kmeans(scale(d_tsne_1[-3]), components_number)  
     d_tsne_1_original$cl_kmeans <- factor(fit_cluster_kmeans$cluster)
     
@@ -76,14 +82,17 @@ tsne_plotting <- function(tsn_list, percent = .05){
     ## and finally: putting the plots side by side with gridExtra lib...
     grid.arrange(plot_k, plot_h,  ncol = 2)
     
+    
+    # save cluster membership for confusion matrix
+    write.csv2(data.frame(clusters=fit_cluster_kmeans$cluster),paste0("resources/output/post/", gsub("resources/output/sentence//|\\_links\\.csv","",alllinks[[number]]),"-TSNE-cluster.csv"), row.names = F, col.names = F, sep = ";")
   }
 }
 
 
 structuralFeatures <- function(book, nodes, links, cooc){
   
-  rownames(cooc) <- cooc[,1]
-  cooc[,1] <- NULL
+  #rownames(cooc) <- cooc[,1]
+  #cooc[,1] <- NULL
   
   casc <- c()
   inter <- c()
@@ -183,8 +192,17 @@ structuralFeatures <- function(book, nodes, links, cooc){
   nodeFeatures <- as.data.frame(cbind(nodes$title,wien,struct[,c(2,3)]),stringsAsFactors = F)
   nodeFeatures$order <- rownames(nodeFeatures)
   colnames(nodeFeatures) <- c("terms","entropy","evenness","richness","density","modularity","order")
+  nodeFeatures$order <- as.numeric(nodeFeatures$order)
+  nodeFeatures$entropy <- as.numeric(nodeFeatures$entropy)
+  nodeFeatures$evenness <- as.numeric(nodeFeatures$evenness)
+  nodeFeatures$richness <- as.numeric(nodeFeatures$richness)
+  nodeFeatures$density <- as.numeric(nodeFeatures$density)
+  nodeFeatures$modularity <- as.numeric(nodeFeatures$modularity)
+  nodeFeatures$density[which(is.nan(nodeFeatures$entropy))] <- 0
+  nodeFeatures$density[which(is.nan(nodeFeatures$density))] <- 0
   nodeFeatures <- nodeFeatures[which(nodeFeatures$terms!=""),]
   for(i in 1:nrow(nodeFeatures)){
+    #print(length(unlist(strsplit(nodeFeatures$terms[i],", "))))
     if(length(unlist(strsplit(nodeFeatures$terms[i],", "))) > 1){
       nextTerms <- unlist(strsplit(nodeFeatures$terms[i],", "))
       nodeFeatures$terms[i] <- nextTerms[1]
@@ -194,14 +212,8 @@ structuralFeatures <- function(book, nodes, links, cooc){
     }
   }
   
-  nodeFeatures$order <- as.numeric(nodeFeatures$order)
-  nodeFeatures$entropy <- as.numeric(nodeFeatures$entropy)
-  nodeFeatures$evenness <- as.numeric(nodeFeatures$evenness)
-  nodeFeatures$richness <- as.numeric(nodeFeatures$richness)
-  nodeFeatures$density <- as.numeric(nodeFeatures$density)
-  nodeFeatures$modularity <- as.numeric(nodeFeatures$modularity)
   nodeFeatures <- nodeFeatures[order(nodeFeatures$order),]
-  
+  print(book)
   termFeaturesNodes <- cbind(aggregate(entropy ~ terms,nodeFeatures,FUN = function(x){mean(diff(x))}),
                              aggregate(evenness ~ terms,nodeFeatures,mean),
                              aggregate(richness ~ terms,nodeFeatures,mean),
@@ -210,7 +222,7 @@ structuralFeatures <- function(book, nodes, links, cooc){
   termFeaturesNodes$entropy[which(is.nan(termFeaturesNodes$entropy))] <- 0
   termFeaturesNodes <- termFeaturesNodes[with(termFeaturesNodes, order(terms)), ]
   
-  ktmp <- kmeans(termFeaturesNodes[,-c(1,3,5,7,9)],5)
+  ktmp <- kmeans(termFeaturesNodes[,-c(1,3,5,7,9)],getClusterNumber(termFeaturesNodes[,-c(1,3,5,7,9)], percent = .05))
   foo <- termFeaturesNodes[-c(1,3,5,7,9)]
   PCA <-prcomp(foo)$x
   plot(PCA, col=ktmp$cluster,pch=20,main = paste0("Node features ",book))
@@ -219,6 +231,9 @@ structuralFeatures <- function(book, nodes, links, cooc){
   text(x=PCA[,2], y=PCA[,3], cex=0.6, pos=4, labels=(termFeaturesNodes$terms))
   plot(PCA[,1],PCA[,3], col=ktmp$cluster,pch=20,main = paste0("Node features ",book))
   text(x=PCA[,1], y=PCA[,3], cex=0.6, pos=4, labels=(termFeaturesNodes$terms))
+  
+  # save cluster membership for confusion matrix
+  write.csv2(data.frame(clusters=ktmp$cluster),paste0("resources/output/post/", book,"-nodeFeatures-cluster.csv"), row.names = F, col.names = F, sep = ";")
   
   # further analysis tests
   
@@ -269,8 +284,9 @@ structuralFeatures <- function(book, nodes, links, cooc){
   fusedTerms[recNOTco,5] <- linkFeatures[recNOTco,2]
   
   structuralFeatures <- cbind(fusedTerms,termFeaturesNodes)
+  print(head(structuralFeatures))
   
-  ktmp <- kmeans(structuralFeatures[,-c(1,2,3,7,9,11,13,15)],5)
+  ktmp <- kmeans(structuralFeatures[,-c(1,2,3,7,9,11,13,15)],getClusterNumber(structuralFeatures[,-c(1,2,3,7,9,11,13,15)], percent = .05))
   foo <- structuralFeatures[,-c(1,2,3,7,9,11,13,15)]
   PCA <-prcomp(foo)$x
   plot(PCA, col=ktmp$cluster,pch=20,main = paste0("Combined features ",book))
@@ -279,6 +295,10 @@ structuralFeatures <- function(book, nodes, links, cooc){
   text(x=PCA[,2], y=PCA[,3], cex=0.6, pos=4, labels=(row.names(foo)))
   plot(PCA[,1],PCA[,3], col=ktmp$cluster,pch=20,main = paste0("Combined features ",book))
   text(x=PCA[,1], y=PCA[,3], cex=0.6, pos=4, labels=(row.names(foo)))
+  
+  
+  # save cluster membership for confusion matrix
+  write.csv2(data.frame(clusters=ktmp$cluster),paste0("resources/output/post/", book,"-allFeatures-cluster.csv"), row.names = F, col.names = F, sep = ";")
 }
 # Start of the Code -------------------------------------------------------
 
@@ -328,8 +348,8 @@ for(sent in cooc){
   test <- Rtsne::Rtsne(sent,check_duplicates=FALSE,
                      pca=TRUE, perplexity = 2, theta=0.5, dims=2)
   
-  plot(test$Y)
-  text(test$Y, labels=rownames(sent))
+  #plot(test$Y)
+  #text(test$Y, labels=rownames(sent))
   
   tsn_list[[length(tsn_list) + 1]] <- test
   names_list[[length(names_list) + 1]] <- rownames(sent)
@@ -340,7 +360,7 @@ tsne_plotting(tsn_list)
 
 # structural feature analysis
 for(nextBook in 1:length(link)){
-  structuralFeatures(gsub("resources/output/sentence//|\\_links.csv","",alllinks[[nextBook]]),node[[nextBook]],link[[nextBook]],cooc[[nextBook]])
+  structuralFeatures(gsub("resources/output/sentence//|\\_links\\.csv","",alllinks[[nextBook]]),node[[nextBook]],link[[nextBook]],cooc[[nextBook]])
 }
 
 #random forest example
