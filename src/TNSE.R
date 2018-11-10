@@ -5,10 +5,10 @@ library(gridExtra)
 # Function ----------------------------------------------------------------
 plot_cluster <- function(data, var_cluster, palette)  
 {
-  ggplot(data, aes_string(x="V1", y="V2", color=var_cluster)) +
-  geom_point(size= 1) +
+  ggplot(data, aes_string(x = "V1", y = "V2", color = var_cluster)) +
+  geom_point(size = 1) +
   geom_label(aes(label = rowname)) +
-  guides(colour=guide_legend(override.aes=list(size=6))) +
+  guides(colour=guide_legend(override.aes = list(size = 6))) +
   xlab("") + ylab("") +
   ggtitle("") +
   theme_light(base_size=20) +
@@ -30,7 +30,7 @@ kmIC <-  function(fit){
                     BIC = D + log(n) * m * k))
 }
 
-getClusterNumber <- function(dat, percent=.05){
+getClusterNumber <- function(dat, percent =.05){
   rng <- 2:18 #K from 2 to 20
   tries <- 100 #Run the K Means algorithm 100 times 
   avg.totw.ss <- integer(length(rng)) #Set up an empty vector to hold all of points 
@@ -247,10 +247,10 @@ structuralFeatures <- function(book, nodes, links, cooc){
   #which(feature_perf == max(feature_perf))
   
   test <- Rtsne::Rtsne(scale(termFeaturesNodes[,-c(1,3,5,7,9)]),check_duplicates=FALSE,
-                       pca=TRUE, perplexity = 2, theta=0.5, dims=2)
+                       pca=TRUE, perplexity = 5, theta = 0.5, dims = 2)
   d_tsne_1_original <-  test$Y
   
-  fit_cluster_kmeans <- fpc::kmeansruns(scale(d_tsne_1_original),krange=2:(nrow(d_tsne_1_original)/2),critout=F,runs=5,criterion="ch")
+  fit_cluster_kmeans <- fpc::kmeansruns(scale(d_tsne_1_original),krange = 2:(nrow(d_tsne_1_original)/2),critout=F,runs=5,criterion="ch")
   colpal <- randomcoloR::distinctColorPalette(fit_cluster_kmeans$bestk)
   plot(d_tsne_1_original[,1], d_tsne_1_original[,2], col=colpal[fit_cluster_kmeans$cluster],pch=20,main = paste0("Node features TSNE ",book,
                                                                                                                " k=",fit_cluster_kmeans$bestk,
@@ -412,7 +412,7 @@ names_list <- list()
 for(sent in cooc){
 
   test <- Rtsne::Rtsne(sent,check_duplicates=FALSE,
-                     pca=TRUE, perplexity = 2, theta=0.5, dims=2)
+                     pca=TRUE, perplexity = 5, theta=0.5, dims=2)
   
   #plot(test$Y)
   #text(test$Y, labels=rownames(sent))
