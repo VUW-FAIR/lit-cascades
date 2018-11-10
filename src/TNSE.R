@@ -22,18 +22,17 @@ plot_cluster <- function(data, var_cluster, palette)
 
 #evaluate kmeans cluster quality
 kmIC <-  function(fit){
-  
   m = ncol(fit$centers)
   n = length(fit$cluster)
   k = nrow(fit$centers)
-  D = fit$tot.withinss
+  D = -fit$tot.withinss/2
   return(data.frame(AIC = D + 2 * m * k,
                     BIC = D + log(n) * m * k))
 }
 
-getClusterNumber <- function(dat, percent){
-  rng <- 2:12 #K from 2 to 20
-  tries <- 500 #Run the K Means algorithm 500 times 
+getClusterNumber <- function(dat, percent=.05){
+  rng <- 2:18 #K from 2 to 20
+  tries <- 100 #Run the K Means algorithm 100 times 
   avg.totw.ss <- integer(length(rng)) #Set up an empty vector to hold all of points 
   avgkIC <- double(length(rng))
   
@@ -41,14 +40,16 @@ getClusterNumber <- function(dat, percent){
     v.totw.ss <- integer(tries) #Set up an empty vector to hold the 100 tries
     tmpkIC <- double(tries)
     for(i in 1:tries){
-      k.temp <- kmeans(scale(dat), centers = v) #Run kmeans
+      k.temp <- kmeans(dat, centers = v) #Run kmeans
       v.totw.ss[i] <- k.temp$tot.withinss#Store the total withinss
-      tmpkIC[i]  <- kmIC(k.temp)$BIC
+      tmpkIC[i]  <- BIC(k.temp)
     }
     avg.totw.ss[v-1] <- mean(v.totw.ss) #Average the 100 total withinss 
     avgkIC[v-1] <-mean(tmpkIC) 
   }
-  components_number <-  sum(abs(diff(avg.totw.ss)) >= (max(abs(diff(avg.totw.ss))) * percent))
+  #components_number <-  sum(abs(diff(avg.totw.ss)) >= (max(abs(diff(avg.totw.ss))) * percent))
+  print(avgkIC)
+  components_number <- which(avgkIC == min(avgkIC)) + 1
   return(components_number)
 }
 
@@ -68,7 +69,10 @@ tsne_plotting <- function(tsn_list, percent = .05){
     ## Creating k-means clustering model, and assigning the result to the data used to create the tsne
     #print(components_number)
     #fit_cluster_kmeans <-  kmeans(scale(d_tsne_1[-3]), components_number)  
-    fit_cluster_kmeans <- fpc::kmeansruns(scale(d_tsne_1[-3]),krange=2:12,critout=F,runs=2,criterion="ch")
+    fit_cluster_kmeans <- fpc::kmeansruns(scale(d_tsne_1[-3]),krange=2:(nrow(d_tsne_1)/2),critout=F,runs=5,criterion="ch")
+    
+    colpal <- randomcoloR::distinctColorPalette(fit_cluster_kmeans$bestk)
+    
     d_tsne_1_original$cl_kmeans <- factor(fit_cluster_kmeans$cluster)
     
     ## Creating hierarchical cluster model, and assigning the result to the data used to create the tsne
@@ -77,12 +81,17 @@ tsne_plotting <- function(tsn_list, percent = .05){
     ## setting 3 clusters as output
     d_tsne_1_original$cl_hierarchical <-  factor(cutree(fit_cluster_hierarchical, k = fit_cluster_kmeans$bestk)) 
     
-    plot_k <- plot_cluster(d_tsne_1_original, "cl_kmeans", "Paired")  
-    plot_h <- plot_cluster(d_tsne_1_original, "cl_hierarchical", "Paired")
+    #plot_k <- plot_cluster(d_tsne_1_original, "cl_kmeans", "Paired")  
+    #plot_h <- plot_cluster(d_tsne_1_original, "cl_hierarchical", "Paired")
     
     ## and finally: putting the plots side by side with gridExtra lib...
-    grid.arrange(plot_k, plot_h,  ncol = 2)
+    #grid.arrange(plot_k, plot_h,  ncol = 2)
     
+    plot(d_tsne_1_original$V1, d_tsne_1_original$V2, col=colpal[fit_cluster_kmeans$cluster],pch=20,main = paste0("Co-occurrence ",gsub("resources/output/sentence//|\\_links\\.csv","",alllinks[[number]]),
+                                                                                                          " k=",fit_cluster_kmeans$bestk,
+                                                                                                          " ch=",max(fit_cluster_kmeans$crit)))
+    text(x=d_tsne_1_original$V1, y=d_tsne_1_original$V2, cex=0.6, pos=4, labels=(d_tsne_1_original$rowname))
+    #legend("topright", inset=c(-0.2,0), legend = paste("Cluster", fit_cluster_kmeans$cluster), pch=20, col=colpal[fit_cluster_kmeans$cluster], box.lty=0)
     
     # save cluster membership for confusion matrix
     write.csv2(data.frame(clusters=fit_cluster_kmeans$cluster),paste0("resources/output/post/", gsub("resources/output/sentence//|\\_links\\.csv","",alllinks[[number]]),"-TSNE-cluster.csv"), row.names = F, col.names = F, sep = ";")
@@ -237,14 +246,36 @@ structuralFeatures <- function(book, nodes, links, cooc){
   #feature_perf <- cbind(feature_perf,max(ktmp$crit))
   #which(feature_perf == max(feature_perf))
   
-  ktmp <- fpc::kmeansruns(scale(termFeaturesNodes[,-c(1,3,5,7,9)]),krange=2:12,critout=F,runs=2,criterion="ch")
+  test <- Rtsne::Rtsne(scale(termFeaturesNodes[,-c(1,3,5,7,9)]),check_duplicates=FALSE,
+                       pca=TRUE, perplexity = 2, theta=0.5, dims=2)
+  d_tsne_1_original <-  test$Y
+  
+  fit_cluster_kmeans <- fpc::kmeansruns(scale(d_tsne_1_original),krange=2:(nrow(d_tsne_1_original)/2),critout=F,runs=5,criterion="ch")
+  colpal <- randomcoloR::distinctColorPalette(fit_cluster_kmeans$bestk)
+  plot(d_tsne_1_original[,1], d_tsne_1_original[,2], col=colpal[fit_cluster_kmeans$cluster],pch=20,main = paste0("Node features TSNE ",book,
+                                                                                                               " k=",fit_cluster_kmeans$bestk,
+                                                                                                               " ch=",max(fit_cluster_kmeans$crit)))
+  text(x=d_tsne_1_original[,1], y=d_tsne_1_original[,2], cex=0.6, pos=4, labels=termFeaturesNodes$terms)
+  
+  
+  
+  ktmp <- fpc::kmeansruns(scale(termFeaturesNodes[,-c(1,3,5,7,9)]),krange=2:(nrow(termFeaturesNodes[,-c(1,3,5,7,9)])/2),critout=F,runs=2,criterion="ch")
   foo <- scale(termFeaturesNodes[-c(1,3,5,7,9)])
+
+  colpal <- randomcoloR::distinctColorPalette(ktmp$bestk)
+  
   PCA <-prcomp(foo)$x
-  plot(PCA, col=ktmp$cluster,pch=20,main = paste0("Node features ",book))
+  plot(PCA, col=colpal[ktmp$cluster],pch=20,main = paste0("Node features ",book,
+                                                          " k=",ktmp$bestk,
+                                                          " ch=",max(ktmp$crit)))
   text(x=PCA[,1], y=PCA[,2], cex=0.6, pos=4, labels=(termFeaturesNodes$terms))
-  plot(PCA[,2],PCA[,3], col=ktmp$cluster,pch=20,main = paste0("Node features ",book))
+  plot(PCA[,2],PCA[,3], col=colpal[ktmp$cluster],pch=20,main = paste0("Node features ",book,
+                                                                      " k=",ktmp$bestk,
+                                                                      " ch=",max(ktmp$crit)))
   text(x=PCA[,2], y=PCA[,3], cex=0.6, pos=4, labels=(termFeaturesNodes$terms))
-  plot(PCA[,1],PCA[,3], col=ktmp$cluster,pch=20,main = paste0("Node features ",book))
+  plot(PCA[,1],PCA[,3], col=colpal[ktmp$cluster],pch=20,main = paste0("Node features ",book,
+                                                                      " k=",ktmp$bestk,
+                                                                      " ch=",max(ktmp$crit)))
   text(x=PCA[,1], y=PCA[,3], cex=0.6, pos=4, labels=(termFeaturesNodes$terms))
   
   # save cluster membership for confusion matrix
@@ -299,17 +330,36 @@ structuralFeatures <- function(book, nodes, links, cooc){
   fusedTerms[recNOTco,5] <- linkFeatures[recNOTco,2]
   
   structuralFeatures <- cbind(fusedTerms,termFeaturesNodes)
-  print(head(structuralFeatures))
+  
   
   #ktmp <- kmeans(scale(structuralFeatures[,-c(1,2,3,7,9,11,13,15)]),getClusterNumber(structuralFeatures[,-c(1,2,3,7,9,11,13,15)], percent = .05))
-  ktmp <- fpc::kmeansruns(scale(structuralFeatures[,-c(1,2,3,7,9,11,13,15)]),krange=2:12,critout=F,runs=2,criterion="ch")
+  test <- Rtsne::Rtsne(scale(structuralFeatures[,-c(1,2,3,7,9,11,13,15)]),check_duplicates=FALSE,
+                       pca=TRUE, perplexity = 2, theta=0.5, dims=2)
+  d_tsne_1_original <-  test$Y
+  fit_cluster_kmeans <- fpc::kmeansruns(scale(d_tsne_1_original),krange=2:(nrow(d_tsne_1_original)/2),critout=F,runs=5,criterion="ch")
+  colpal <- randomcoloR::distinctColorPalette(fit_cluster_kmeans$bestk)
+  plot(d_tsne_1_original[,1], d_tsne_1_original[,2], col=colpal[fit_cluster_kmeans$cluster],pch=20,main = paste0("Combined TSNE ",book,
+                                                                                                               " k=",fit_cluster_kmeans$bestk,
+                                                                                                               " ch=",max(fit_cluster_kmeans$crit)))
+  text(x=d_tsne_1_original[,1], y=d_tsne_1_original[,2], cex=0.6, pos=4, labels=rownames(structuralFeatures))
+  
+  ktmp <- fpc::kmeansruns(scale(structuralFeatures[,-c(1,2,3,7,9,11,13,15)]),krange=2:(nrow(structuralFeatures[,-c(1,2,3,7,9,11,13,15)])/2),critout=F,runs=2,criterion="ch")
+  
+  colpal <- randomcoloR::distinctColorPalette(ktmp$bestk)
+  
   foo <- scale(structuralFeatures[,-c(1,2,3,7,9,11,13,15)])
   PCA <-prcomp(foo)$x
-  plot(PCA, col=ktmp$cluster,pch=20,main = paste0("Combined features ",book))
+  plot(PCA, col=colpal[ktmp$cluster],pch=20,main = paste0("Combined features ",book,
+                                                          " k=",ktmp$bestk,
+                                                          " ch=",max(ktmp$crit)))
   text(x=PCA[,1], y=PCA[,2], cex=0.6, pos=4, labels=(row.names(foo)))
-  plot(PCA[,2],PCA[,3], col=ktmp$cluster,pch=20,main = paste0("Combined features ",book))
+  plot(PCA[,2],PCA[,3], col=colpal[ktmp$cluster],pch=20,main = paste0("Combined features ",book,
+                                                                      " k=",ktmp$bestk,
+                                                                      " ch=",max(ktmp$crit)))
   text(x=PCA[,2], y=PCA[,3], cex=0.6, pos=4, labels=(row.names(foo)))
-  plot(PCA[,1],PCA[,3], col=ktmp$cluster,pch=20,main = paste0("Combined features ",book))
+  plot(PCA[,1],PCA[,3], col=colpal[ktmp$cluster],pch=20,main = paste0("Combined features ",book,
+                                                                      " k=",ktmp$bestk,
+                                                                      " ch=",max(ktmp$crit)))
   text(x=PCA[,1], y=PCA[,3], cex=0.6, pos=4, labels=(row.names(foo)))
   
   
@@ -345,9 +395,9 @@ for(bb in 1:length(cooc)){
   cooc[[bb]][,1] <- NULL
   
   # rare co-occurring terms
-  rareT <- which(rowSums(cooc[[bb]]) <= ceiling(max(rowSums(cooc[[bb]])) * .10))
+  rareT <- which(rowSums(cooc[[bb]]) <= ceiling(max(rowSums(cooc[[bb]])) * .15))
   # frequent co-occ terms
-  freqT <- which(rowSums(cooc[[bb]]) > ceiling(max(rowSums(cooc[[bb]])) * .10))
+  freqT <- which(rowSums(cooc[[bb]]) > ceiling(max(rowSums(cooc[[bb]])) * .15))
   # rare terms only co-occurring with rare terms
   finalRare <- which(colSums(cooc[[bb]][freqT,]) == 0)
   
