@@ -33,6 +33,7 @@ options(scipen = 999)
 allwords <- FALSE
 # Functions ---------------------------------------------------------------
 
+prefixes <- c("Mr.","Mrs.","Madame","Sir","Mr","Ms.","Miss","Mrs","Monsieur")
 
 degree.distribution <- function (graph, cumulative = FALSE, ...) 
 {
@@ -158,11 +159,17 @@ for(sliceSize in list("sentence")){
         
         if(nrow(peps)>0){
           peplist <- unique(unlist(lapply(c(1:nrow(peps)),function(x){
-            if(x %in% compeps){
-              paste0(peps$token[x],"_",peps$token[x+1])
-            } else if((x-1) %in% compeps){
+            if((x-1) %in% compeps){
               
-            } else{
+            } else if(x %in% compeps){
+              full_pers <- peps$token[x]
+              k<-0
+              while((x+k) %in% compeps){
+                k<-k+1
+                full_pers <- paste0(full_pers,"_",peps$token[x+k])
+              }
+              full_pers
+            }  else{
               paste0(peps$token[x])
             }
           })))
@@ -190,7 +197,7 @@ for(sliceSize in list("sentence")){
         traitwords_out[which(traitwords_out == tokens$lemma[which(traitwords_out == tokens$lemma)])] <- tolower(tokens$token[which(tokens$lemma == traitwords_out)])
         traitwords_out[which(traitwords_out %in% neg_deps)] <- tolower(paste0("#-",traitwords_out[which(traitwords_out %in% neg_deps)]))
         if(length(traitwords_out)>0 & length(peplist)>0){ 
-          traitwords_out <- unlist(lapply(traitwords_out,function(x){tolower(paste0(x,"::",peplist))}))
+          traitwords_out <- unlist(lapply(traitwords_out,function(x){tolower(paste0(peplist,"::",x))}))
         } else {
           traitwords_out <- c()
         }
