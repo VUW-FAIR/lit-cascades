@@ -21,7 +21,7 @@
 # under the License.
 
 #set working directoy
-setwd(here::here())
+setwd("/home/STAFF/luczakma/RProjects/tic-personality-words/")
 
 #Rprof(profile_out <- "profile.txt")
 
@@ -139,6 +139,9 @@ for(sliceSize in list("sentence")){
     #trait_words <- tolower(readLines(paste0("resources/output/",
     #                                        theSource,"_random.csv")))
     trait_words <- gsub("\\s*", "", tolower(readLines('resources/Personal Traits.txt')))
+    
+    pers_state <- list()
+    
     outer_lapply <- lapply(words300B, function(xx){
       result = tryCatch({
         
@@ -148,6 +151,33 @@ for(sliceSize in list("sentence")){
         #Coref <- coreNLP::getCoreference(annotation)
         neg_deps <- Deps[Deps$type == "neg",]$governor
         advs <- tokens[tokens$POS == "JJ",c("lemma","token")]
+        peps <- tokens[tokens$NER == "PERSON",c("id","token")]
+        peps$id <- as.numeric(peps$id)
+        
+        compeps <- which(diff(peps$id)==1)
+        
+        if(nrow(peps)>0){
+          peplist <- unique(unlist(lapply(c(1:nrow(peps)),function(x){
+            if(x %in% compeps){
+              paste0(peps$token[x],"_",peps$token[x+1])
+            } else if((x-1) %in% compeps){
+              
+            } else{
+              paste0(peps$token[x])
+            }
+          })))
+        } else{
+          peplist <- list()
+        }
+        
+        if(length(peplist) == 0 & length(which(tokens$lemma == "he" | tokens$lemma == "she")) > 0){
+          # no new people, so check whether we have he or she
+          peplist <- pers_state
+        } else{
+          # new peplist into state
+          pers_state <<- peplist
+        }
+        
         if(allwords){
           xx <- gsub(",|\\.|;|:|\\'\\\\\"",'', xx)
           xx <- unlist(strsplit(xx, split = ' '))
@@ -157,15 +187,21 @@ for(sliceSize in list("sentence")){
         matched <- match(trait_words,xx)
         traitwords_out <- trait_words[which(!is.na(matched))]
         ## Replacing lemmatised word with token word to allow for matching of negative dependencies
-        traitwords_out[which(traitwords_out == advs$lemma)] <- tolower(advs$token[which(advs$lemma == traitwords_out)])
+        traitwords_out[which(traitwords_out == tokens$lemma[which(traitwords_out == tokens$lemma)])] <- tolower(tokens$token[which(tokens$lemma == traitwords_out)])
         traitwords_out[which(traitwords_out %in% neg_deps)] <- tolower(paste0("#-",traitwords_out[which(traitwords_out %in% neg_deps)]))
+        if(length(traitwords_out)>0 & length(peplist)>0){ 
+          traitwords_out <- unlist(lapply(traitwords_out,function(x){tolower(paste0(x,"::",peplist))}))
+        } else {
+          traitwords_out <- c()
+        }
+        
         rm(annotation)
         rm(tokens)
         rm(Deps)
         rm(neg_deps)
         rm(advs)
         gc()
-        traitwords_out
+        unique(traitwords_out)
         
       }, warning = function(warning_condition) {}, error = function(error_condition) {}, finally={})
     })
