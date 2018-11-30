@@ -157,7 +157,7 @@ for(sliceSize in list("sentence")){
             matched <- match(trait_words,xx)
             traitwords_out <- trait_words[which(!is.na(matched))]
             ## Replacing lemmatised word with token word to allow for matching of negative dependencies
-            traitwords_out[which(traitwords_out == advs$lemma)] <- tolower(advs$token[which(advs$lemma == traitwords_out)])
+            traitwords_out[which(traitwords_out == tokens$lemma[which(traitwords_out == tokens$lemma)])] <- tolower(tokens$token[which(tokens$lemma == traitwords_out)])
             traitwords_out[which(traitwords_out %in% neg_deps)] <- tolower(paste0("#-",traitwords_out[which(traitwords_out %in% neg_deps)]))
             rm(annotation)
             rm(tokens)

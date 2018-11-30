@@ -21,7 +21,7 @@
 # under the License.
 
 #set working directoy
-setwd("/home/STAFF/luczakma/RProjects/tic-personality-words/")
+setwd(here::here())
 
 #Rprof(profile_out <- "profile.txt")
 
