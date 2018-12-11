@@ -402,6 +402,10 @@ for(bb in 1:length(cooc)){
   finalRare <- which(colSums(cooc[[bb]][freqT,]) == 0)
   
   cooc[[bb]] <- cooc[[bb]][-finalRare,-finalRare]
+  
+  if(length(which(rowSums(cooc[[bb]])==0)) > 0){
+    cooc[[bb]] <- cooc[[bb]][-(which(rowSums(cooc[[bb]])==0)),-(which(rowSums(cooc[[bb]])==0))]
+  }
   #cooc[[bb]] <- cooc[[bb]][-which(rowSums(cooc[[bb]]) < ceiling(max(rowSums(cooc[[bb]])) * .10)),
   #                         -which(colSums(cooc[[bb]]) < ceiling(max(colSums(cooc[[bb]])) * .10))]
   
@@ -412,7 +416,7 @@ names_list <- list()
 for(sent in cooc){
 
   test <- Rtsne::Rtsne(sent,check_duplicates=FALSE,
-                     pca=TRUE, perplexity = 5, theta=0.5, dims=2)
+                     pca=TRUE, perplexity = 3, theta=0.5, dims=2)
   
   #plot(test$Y)
   #text(test$Y, labels=rownames(sent))

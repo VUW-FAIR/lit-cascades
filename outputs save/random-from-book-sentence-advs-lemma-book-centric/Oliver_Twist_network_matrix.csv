@@ -1,0 +1,16 @@
+"" "compact" "covered" "foregoing" "grimy" "haughty" "ineffectual" "little" "possible" "responsible" "petty" "shadowy" "needful" "public" "punctual" "white"
+"compact" 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0
+"covered" 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0
+"foregoing" 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0
+"grimy" 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0
+"haughty" 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0
+"ineffectual" 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0
+"little" 0 1 0 0 1 0 0 0 0 0 0 1 2 1 1
+"possible" 0 0 1 0 0 0 0 0 0 0 0 0 1 0 0
+"responsible" 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+"petty" 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0
+"shadowy" 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0
+"needful" 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0
+"public" 0 0 0 0 0 0 2 1 0 0 0 0 0 0 0
+"punctual" 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0
+"white" 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0

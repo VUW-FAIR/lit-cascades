@@ -1,0 +1,12 @@
+"" "devilish" "inferior" "needful" "old" "pernicious" "red" "same" "handsome" "unconscious" "right" "varied"
+"devilish" 0 0 0 0 0 0 0 1 0 0 0
+"inferior" 0 0 0 1 0 0 0 0 0 0 0
+"needful" 0 0 0 1 0 0 0 0 1 0 0
+"old" 0 1 1 0 0 0 1 0 0 0 0
+"pernicious" 0 0 0 0 0 0 0 0 0 1 0
+"red" 0 0 0 0 0 0 1 0 0 0 0
+"same" 0 0 0 1 0 1 0 0 0 0 1
+"handsome" 1 0 0 0 0 0 0 0 0 0 0
+"unconscious" 0 0 1 0 0 0 0 0 0 0 0
+"right" 0 0 0 0 1 0 0 0 0 0 0
+"varied" 0 0 0 0 0 0 1 0 0 0 0
