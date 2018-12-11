@@ -1,9 +1,0 @@
-"" "#-disappointed" "bright" "direct" "general" "particular" "single" "sheltered" "wretched"
-"#-disappointed" 0 0 0 0 0 1 0 0
-"bright" 0 0 0 0 0 0 1 0
-"direct" 0 0 0 0 0 0 0 1
-"general" 0 0 0 0 1 1 0 0
-"particular" 0 0 0 1 0 1 0 1
-"single" 1 0 0 1 1 0 0 0
-"sheltered" 0 1 0 0 0 0 0 0
-"wretched" 0 0 1 0 1 0 0 0
