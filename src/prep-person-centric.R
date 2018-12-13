@@ -30,7 +30,7 @@ setwd(here::here())
 
 #housekeeping and helpers
 options(scipen = 999)
-allwords <- FALSE
+allwords <- TRUE
 # Functions ---------------------------------------------------------------
 
 prefixes <- c("Mr.","Mrs.","Madame","Sir","Mr","Ms.","Miss","Mrs","Monsieur")
@@ -136,10 +136,12 @@ for(sliceSize in list("sentence")){
     
     
     #character list
-    #trait_words <- tolower(readLines('resources/random-500.txt'))
-    #trait_words <- tolower(readLines(paste0("resources/output/",
-    #                                        theSource,"_random.csv")))
-    trait_words <- gsub("\\s*", "", tolower(readLines('resources/Personal Traits.txt')))
+    # random word lists -> allwords <- TRUE
+    trait_words <- tolower(readLines('resources/random-500.txt'))
+    #trait_words <- tolower(readLines(paste0("resources/output/",theSource,"_random.csv")))
+    
+    #trait_words <- gsub("\\s*", "", tolower(readLines('resources/Personal Traits.txt')))
+    #trait_words <- tolower(readLines('resources/pda500.txt'))
     
     pers_state <- list()
     
