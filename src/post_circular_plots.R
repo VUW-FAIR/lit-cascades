@@ -9,7 +9,7 @@ library(RColorBrewer)
 n <- nrow(unique(clusters))
 qual_col_pals = brewer.pal.info[brewer.pal.info$category == 'qual',]
 col_vector = unlist(mapply(brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals)))
-colcodes <- sample(col_vector, n)
+colcodes <- sample(col_vector, n, replace = T)
 
 colframe <- data.frame(terms=rownames(mat),clusters=clusters)
 colframe$colcode <- colcodes[colframe$clusters]
