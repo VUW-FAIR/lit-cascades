@@ -247,40 +247,35 @@ structuralFeatures <- function(book, nodes, links, cooc){
   #which(feature_perf == max(feature_perf))
   
   test <- Rtsne::Rtsne(scale(termFeaturesNodes[,-c(1,3,5,7,9)]),check_duplicates=FALSE,
-                       pca=TRUE, perplexity = 5, theta = 0.5, dims = 2)
+                        pca=TRUE, perplexity = 5, theta = 0.5, dims = 2)
   d_tsne_1_original <-  test$Y
-  
+  #
   fit_cluster_kmeans <- fpc::kmeansruns(scale(d_tsne_1_original),krange = 2:(nrow(d_tsne_1_original)/2),critout=F,runs=5,criterion="ch")
   colpal <- randomcoloR::distinctColorPalette(fit_cluster_kmeans$bestk)
   plot(d_tsne_1_original[,1], d_tsne_1_original[,2], col=colpal[fit_cluster_kmeans$cluster],pch=20,main = paste0("Node features TSNE ",book,
-                                                                                                               " k=",fit_cluster_kmeans$bestk,
-                                                                                                               " ch=",max(fit_cluster_kmeans$crit)))
+                                                                                                                " k=",fit_cluster_kmeans$bestk,
+                                                                                                                " ch=",max(fit_cluster_kmeans$crit)))
   text(x=d_tsne_1_original[,1], y=d_tsne_1_original[,2], cex=0.6, pos=4, labels=termFeaturesNodes$terms)
-  
-  
-  
   ktmp <- fpc::kmeansruns(scale(termFeaturesNodes[,-c(1,3,5,7,9)]),krange=2:(nrow(termFeaturesNodes[,-c(1,3,5,7,9)])/2),critout=F,runs=2,criterion="ch")
   foo <- scale(termFeaturesNodes[-c(1,3,5,7,9)])
-
   colpal <- randomcoloR::distinctColorPalette(ktmp$bestk)
-  
   PCA <-prcomp(foo)$x
   plot(PCA, col=colpal[ktmp$cluster],pch=20,main = paste0("Node features ",book,
-                                                          " k=",ktmp$bestk,
+                                                         " k=",ktmp$bestk,
                                                           " ch=",max(ktmp$crit)))
   text(x=PCA[,1], y=PCA[,2], cex=0.6, pos=4, labels=(termFeaturesNodes$terms))
   plot(PCA[,2],PCA[,3], col=colpal[ktmp$cluster],pch=20,main = paste0("Node features ",book,
-                                                                      " k=",ktmp$bestk,
-                                                                      " ch=",max(ktmp$crit)))
+                                                                       " k=",ktmp$bestk,
+                                                                       " ch=",max(ktmp$crit)))
   text(x=PCA[,2], y=PCA[,3], cex=0.6, pos=4, labels=(termFeaturesNodes$terms))
   plot(PCA[,1],PCA[,3], col=colpal[ktmp$cluster],pch=20,main = paste0("Node features ",book,
-                                                                      " k=",ktmp$bestk,
-                                                                      " ch=",max(ktmp$crit)))
+                                                                       " k=",ktmp$bestk,
+                                                                       " ch=",max(ktmp$crit)))
   text(x=PCA[,1], y=PCA[,3], cex=0.6, pos=4, labels=(termFeaturesNodes$terms))
-  
+
   # save cluster membership for confusion matrix
   write.csv2(data.frame(clusters=ktmp$cluster),paste0("resources/output/post/", book,"-nodeFeatures-cluster.csv"), row.names = F, col.names = F, sep = ";")
-  
+
   # further analysis tests
   
   links$dist <- links$target-links$source
@@ -342,11 +337,11 @@ structuralFeatures <- function(book, nodes, links, cooc){
                                                                                                                " k=",fit_cluster_kmeans$bestk,
                                                                                                                " ch=",max(fit_cluster_kmeans$crit)))
   text(x=d_tsne_1_original[,1], y=d_tsne_1_original[,2], cex=0.6, pos=4, labels=rownames(structuralFeatures))
-  
+
   ktmp <- fpc::kmeansruns(scale(structuralFeatures[,-c(1,2,3,7,9,11,13,15)]),krange=2:(nrow(structuralFeatures[,-c(1,2,3,7,9,11,13,15)])/2),critout=F,runs=2,criterion="ch")
-  
+
   colpal <- randomcoloR::distinctColorPalette(ktmp$bestk)
-  
+
   foo <- scale(structuralFeatures[,-c(1,2,3,7,9,11,13,15)])
   PCA <-prcomp(foo)$x
   plot(PCA, col=colpal[ktmp$cluster],pch=20,main = paste0("Combined features ",book,
@@ -365,6 +360,7 @@ structuralFeatures <- function(book, nodes, links, cooc){
   
   # save cluster membership for confusion matrix
   write.csv2(data.frame(clusters=ktmp$cluster),paste0("resources/output/post/", book,"-allFeatures-cluster.csv"), row.names = F, col.names = F, sep = ";")
+  write.csv2(structuralFeatures,paste0("resources/output/post/", book,"-allFeatures-output.csv"), row.names = F, col.names = F, sep = ";")
 }
 # Start of the Code -------------------------------------------------------
 
