@@ -1,6 +1,8 @@
 library(tidyverse)
 
-library(gridExtra)  
+library(gridExtra)
+
+setwd("/Users/mlr/OneDrive - Victoria University of Wellington - STAFF/Git/tic-personality-words/outputs save/pda500-sentence-advs-lemma-book-centric/")
 
 # Function ----------------------------------------------------------------
 plot_cluster <- function(data, var_cluster, palette)  
@@ -94,7 +96,7 @@ tsne_plotting <- function(tsn_list, percent = .05){
     #legend("topright", inset=c(-0.2,0), legend = paste("Cluster", fit_cluster_kmeans$cluster), pch=20, col=colpal[fit_cluster_kmeans$cluster], box.lty=0)
     
     # save cluster membership for confusion matrix
-    write.csv2(data.frame(clusters=fit_cluster_kmeans$cluster),paste0("resources/output/post/", gsub("resources/output/sentence//|\\_links\\.csv","",alllinks[[number]]),"-TSNE-cluster.csv"), row.names = F, col.names = F, sep = ";")
+    write.csv2(data.frame(clusters=fit_cluster_kmeans$cluster),paste0(gsub("\\_links\\.csv","",alllinks[[number]]),"-TSNE-cluster.csv"), row.names = F, col.names = F, sep = ";")
   }
 }
 
@@ -196,7 +198,7 @@ structuralFeatures <- function(book, nodes, links, cooc){
   }
   
   write.table(cbind(coordinates, wien, struct),
-              file=paste0("resources/output/post/", book,
+              file=paste0(book,
                           "_temporal_statistics.csv"), row.names = F, col.names = F, sep = ";")
   
   nodeFeatures <- as.data.frame(cbind(nodes$title,wien,struct[,c(2,3)]),stringsAsFactors = F)
@@ -274,7 +276,7 @@ structuralFeatures <- function(book, nodes, links, cooc){
   text(x=PCA[,1], y=PCA[,3], cex=0.6, pos=4, labels=(termFeaturesNodes$terms))
 
   # save cluster membership for confusion matrix
-  write.csv2(data.frame(clusters=ktmp$cluster),paste0("resources/output/post/", book,"-nodeFeatures-cluster.csv"), row.names = F, col.names = F, sep = ";")
+  write.csv2(data.frame(clusters=ktmp$cluster),paste0(book,"-nodeFeatures-cluster.csv"), row.names = F, col.names = F, sep = ";")
 
   # further analysis tests
   
@@ -359,22 +361,22 @@ structuralFeatures <- function(book, nodes, links, cooc){
   
   
   # save cluster membership for confusion matrix
-  write.csv2(data.frame(clusters=ktmp$cluster),paste0("resources/output/post/", book,"-allFeatures-cluster.csv"), row.names = F, col.names = F, sep = ";")
-  write.csv2(structuralFeatures,paste0("resources/output/post/", book,"-allFeatures-output.csv"), row.names = F, col.names = F, sep = ";")
+  write.csv2(data.frame(clusters=ktmp$cluster),paste0(book,"-allFeatures-cluster.csv"), row.names = F, col.names = F, sep = ";")
+  write.csv2(structuralFeatures,paste0(book,"-allFeatures-output.csv"), row.names = F, col.names = F, sep = ";")
 }
 # Start of the Code -------------------------------------------------------
 
 
 ## Creating a list with all co-ocurrence matrices for all outputs
-allmatrices <- list.files(paste0("resources/output/", "sentence", "/"),
+allmatrices <- list.files(paste0("."),
                             pattern = "(.*)_network_matrix.csv",
                             full.names = T)
 
-alllinks <- list.files(paste0("resources/output/", "sentence", "/"),
+alllinks <- list.files(paste0("."),
                             pattern = "(.*)_links.csv",
                             full.names = T)
 
-allnodes <- list.files(paste0("resources/output/", "sentence", "/"),
+allnodes <- list.files(paste0("."),
                        pattern = "(.*)_nodes.csv",
                        full.names = T)
 
@@ -426,7 +428,7 @@ tsne_plotting(tsn_list)
 
 # structural feature analysis
 for(nextBook in 1:length(link)){
-  structuralFeatures(gsub("resources/output/sentence//|\\_links\\.csv","",alllinks[[nextBook]]),node[[nextBook]],link[[nextBook]],cooc[[nextBook]])
+  structuralFeatures(gsub("\\_links\\.csv","",alllinks[[nextBook]]),node[[nextBook]],link[[nextBook]],cooc[[nextBook]])
 }
 
 #random forest example
