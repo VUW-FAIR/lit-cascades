@@ -21,7 +21,7 @@
 # under the License.
 
 #set working directoy
-setwd(here::here())
+setwd("/home/STAFF/luczakma/RProjects/tic-personality-words/")
 
 #Rprof(profile_out <- "profile.txt")
 
@@ -31,6 +31,7 @@ setwd(here::here())
 #housekeeping and helpers
 options(scipen = 999)
 allwords <- TRUE
+stemTrait <- FALSE
 # Functions ---------------------------------------------------------------
 
 
@@ -137,13 +138,20 @@ for(sliceSize in list("sentence")){
     
     #character list
     # random word lists -> allwords <- TRUE
-    trait_words <- tolower(readLines('resources/random-500.txt'))
+    #trait_words <- tolower(readLines('resources/random-500.txt'))
     #trait_words <- tolower(readLines(paste0("resources/output/",theSource,"_random.csv")))
     
     #trait_words <- gsub("\\s*", "", tolower(readLines('resources/Personal Traits.txt')))
-    #trait_words <- tolower(readLines('resources/pda500.txt'))
+    trait_words <- tolower(readLines('resources/pda500.txt'))
+    #trait_words <- tolower(readLines('resources/pda1710.txt'))
     outer_lapply <- lapply(words300B, function(xx){
       result = tryCatch({
+        
+        if(stemTrait){
+          tm <- tm::Corpus(tm::VectorSource(xx))
+          tm <- tm::tm_map(tm, tm::stemDocument)
+          xx <- tm[[1]]$content
+        }
         
         annotation <- coreNLP::annotateString(xx)
         tokens <- coreNLP::getToken(annotation)
