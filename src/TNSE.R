@@ -2,7 +2,7 @@ library(tidyverse)
 
 library(gridExtra)
 
-setwd("/Users/mlr/OneDrive - Victoria University of Wellington - STAFF/Git/tic-personality-words/outputs save/pda500-sentence-advs-lemma-book-centric/")
+setwd("/Users/mlr/OneDrive - Victoria University of Wellington - STAFF/Git/tic-personality-words/outputs save/random-general-sentence-all-words-book-centric/")
 
 # Function ----------------------------------------------------------------
 plot_cluster <- function(data, var_cluster, palette)  
@@ -433,27 +433,27 @@ for(nextBook in 1:length(link)){
 
 #random forest example
 
-rf.fit <- randomForest::randomForest(x = cooc[[1]], y = NULL, ntree = 10000, proximity = TRUE, oob.prox = TRUE)
-hclust.rf <- hclust(as.dist(1-rf.fit$proximity), method = "ward.D2")
-rf.cluster = cutree(hclust.rf, k=3)
-metricsgraphics::mjs_plot(rf.cluster, x=PC1, y=PC2) %>%
-  metricsgraphics::mjs_point(color_accessor=rf.clusters) %>%
-  metricsgraphics::mjs_labs(x="principal comp 1", y="principal comp 2")
-
-
-#model based example
-library(mclust)
-fit <- mclust::Mclust(cooc[[1]])
-plot(fit) # plot results 
-summary(fit) # display the best model
-#evaluate cluster solutions
-#cluster.stats(cooc[[1]], fit1$cluster, fit2$cluster)
-
-# testing some recurrence network analysis
-g <- igraph::graph_from_data_frame(link[[1]])
-igraph::E(g)$weight <- link[[1]]$target-link[[1]]$source
-g_mat <- igraph::as_adjacency_matrix(g, sparse = F, attr = "weight")
-test <- Rtsne::Rtsne(g_mat,check_duplicates=FALSE,
-                     pca=TRUE, perplexity = 2, theta=0.5, dims=2)
-plot(test$Y)
-text(test$Y, labels=rownames(g_mat))
+# rf.fit <- randomForest::randomForest(x = cooc[[1]], y = NULL, ntree = 10000, proximity = TRUE, oob.prox = TRUE)
+# hclust.rf <- hclust(as.dist(1-rf.fit$proximity), method = "ward.D2")
+# rf.cluster = cutree(hclust.rf, k=3)
+# metricsgraphics::mjs_plot(rf.cluster, x=PC1, y=PC2) %>%
+#   metricsgraphics::mjs_point(color_accessor=rf.clusters) %>%
+#   metricsgraphics::mjs_labs(x="principal comp 1", y="principal comp 2")
+# 
+# 
+# #model based example
+# library(mclust)
+# fit <- mclust::Mclust(cooc[[1]])
+# plot(fit) # plot results 
+# summary(fit) # display the best model
+# #evaluate cluster solutions
+# #cluster.stats(cooc[[1]], fit1$cluster, fit2$cluster)
+# 
+# # testing some recurrence network analysis
+# g <- igraph::graph_from_data_frame(link[[1]])
+# igraph::E(g)$weight <- link[[1]]$target-link[[1]]$source
+# g_mat <- igraph::as_adjacency_matrix(g, sparse = F, attr = "weight")
+# test <- Rtsne::Rtsne(g_mat,check_duplicates=FALSE,
+#                      pca=TRUE, perplexity = 2, theta=0.5, dims=2)
+# plot(test$Y)
+# text(test$Y, labels=rownames(g_mat))
