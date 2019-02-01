@@ -1,5 +1,5 @@
 library(circlize)
-mat<-as.matrix(cooc[[1]])
+mat<-as.matrix(cooc[[5]])
 mat[lower.tri(mat)] <- 0
 par(mar = c(0, 0, 0, 0))
 
