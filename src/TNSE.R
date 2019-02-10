@@ -2,7 +2,7 @@ library(tidyverse)
 
 library(gridExtra)
 
-setwd("/Users/mlr/OneDrive - Victoria University of Wellington - STAFF/Git/tic-personality-words/outputs save/pda1710-sentence-advs-lemma-book-centric/")
+setwd("/Users/mlr/OneDrive - Victoria University of Wellington - STAFF/Git/tic-personality-words/outputs save/pda500-sentence-advs-lemma-book-centric/")
 
 # Function ----------------------------------------------------------------
 plot_cluster <- function(data, var_cluster, palette)  
@@ -183,6 +183,9 @@ structuralFeatures <- function(book, nodes, links, cooc){
     colnames(ent)<-c('empEntropy', 'evenness_log2', 'entropy', 'evenness')
     colnames(wien)<-c('ShannonWiener', 'Pielou', 'Richness')
     
+    rownames(ent) <- c(1:nrow(ent))
+    rownames(wien) <- c(1:nrow(wien))
+    
     #add node
     g1 <- igraph::add_vertices(g1,1,attr = list(id = as.numeric(nodes[z,1])))
     
@@ -210,7 +213,7 @@ structuralFeatures <- function(book, nodes, links, cooc){
   nodeFeatures$richness <- as.numeric(nodeFeatures$richness)
   nodeFeatures$density <- as.numeric(nodeFeatures$density)
   nodeFeatures$modularity <- as.numeric(nodeFeatures$modularity)
-  nodeFeatures$density[which(is.nan(nodeFeatures$entropy))] <- 0
+  nodeFeatures$entropy[which(is.nan(nodeFeatures$entropy))] <- 0
   nodeFeatures$density[which(is.nan(nodeFeatures$density))] <- 0
   nodeFeatures <- nodeFeatures[which(nodeFeatures$terms!=""),]
   for(i in 1:nrow(nodeFeatures)){
@@ -226,7 +229,7 @@ structuralFeatures <- function(book, nodes, links, cooc){
   
   nodeFeatures <- nodeFeatures[order(nodeFeatures$order),]
   print(book)
-  termFeaturesNodes <- cbind(aggregate(entropy ~ terms,nodeFeatures,FUN = function(x){mean(diff(x))}),
+  termFeaturesNodes <- cbind(aggregate(entropy ~ terms,nodeFeatures,mean),#FUN = function(x){mean(diff(x))}),
                              aggregate(evenness ~ terms,nodeFeatures,mean),
                              aggregate(richness ~ terms,nodeFeatures,mean),
                              aggregate(density ~ terms,nodeFeatures,mean),
