@@ -1,11 +1,10 @@
 ## WORD FREQUENCY
 
 # install.packages("tidyverse")
+#library("tidyverse")
 # install.packages("dplyr")
-# install.packages("svglite") ## must also have cairo installed in system
-# install.packages("Rcpp")
+
 library("dplyr")
-library("tidyverse")
 library("ggplot2")
 
 #Setting directory
