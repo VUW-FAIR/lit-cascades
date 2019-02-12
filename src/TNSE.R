@@ -2,7 +2,7 @@ library(tidyverse)
 
 library(gridExtra)
 
-setwd("/Users/mlr/OneDrive - Victoria University of Wellington - STAFF/Git/tic-personality-words/outputs save/pda500-sentence-advs-lemma-book-centric/")
+setwd("/Users/mlr/OneDrive - Victoria University of Wellington - STAFF/Git/tic-personality-words/outputs save/pda1710-sentence-advs-lemma-book-centric/")
 
 # Function ----------------------------------------------------------------
 plot_cluster <- function(data, var_cluster, palette)  
@@ -417,7 +417,7 @@ names_list <- list()
 for(sent in cooc){
 
   test <- Rtsne::Rtsne(sent,check_duplicates=FALSE,
-                     pca=TRUE, perplexity = 3, theta=0.5, dims=2)
+                     pca=TRUE, perplexity = floor(length(rowSums(sent))/3)-1, theta=0.1, dims=2)
   
   #plot(test$Y)
   #text(test$Y, labels=rownames(sent))
