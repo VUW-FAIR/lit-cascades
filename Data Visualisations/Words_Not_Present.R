@@ -9,7 +9,7 @@ DIRECTORY<-"pda1710-sentence-advs-lemma-book-centric" #**
 setwd(DIRECTORY)
 getwd()
 setwd("..") #if you would like to go back one directory
-setwd("PostProc")
+setwd("TIC-VUW")
 setwd(begPath)
 
 
@@ -30,7 +30,7 @@ TXTFILE<-"pda1710.txt" #**
 wordlist<-read.csv(file=TXTFILE, header=T, sep="\t")
 wordlist<-tolower(as.vector(wordlist[,1]))
 wordlist<-unique(wordlist)
-length(wordlist) #499 for pda500
+length(wordlist)
 
 #Function that returns a list of the words not present:
 FrequencyWordsNotPresent<-function(FileToRead,WordList){
@@ -103,7 +103,7 @@ for(i in 1:length(nodescsv[[1]])){
 
 #create dataframe
 df<-as.data.frame(c(wordlist))
-
+df<-as.data.frame(c(wordlista))
 
 #loop for plot and shows in the created dataframe 'df'
 for(b in 1:length(nodescsv[[1]])){#go through each book #length = 25
@@ -147,5 +147,85 @@ ggsave(filename=paste0(paste0("../",DIRECTORY,"/","PostProc","/"),
 "WordsPresent_gridplot.pdf"),device = "pdf", plot = gridplot,
 scale = 1, width = 100, height = 50, units = "cm", dpi = 300, limitsize = TRUE)
 
+#------------------------------------------------------------------------------
 
+
+## For allport-personal-traits-sentence-advs-lemma-book-centric:
+
+#have to make THREE graphs because there are 4000+ words in the wordlist
+wordlist<-sort(wordlist)
+wordlista<-wordlist[1:1486]
+wordlistb<-wordlist[1487:2972]
+wordlistc<-wordlist[2973:4457]
+
+WORDLIST<-wordlistc
+
+df<-as.data.frame(c(WORDLIST))
+
+#loop for plot and shows in the created dataframe 'df'
+for(b in 1:length(nodescsv[[1]])){#go through each book #length = 25
+    file<- nodescsv[[1]][b]
+    nodes<-getwords(file)
+    #colnames(df)[b+1]<-books[[1]][b] #column will show book titles
+    #colnames(df)[b+1]<-paste0("B",b) #+1
+    
+    for(count in 1:length(WORDLIST)){ #go through each word in wordlist and check if in the book
+        word<-WORDLIST[count]
+        #value is either 1 (present) or 0 (not present)
+        if(is.element(word,nodes)){ value<-1 }
+        else{ value<-0 }
+        col<-b+1
+        df[count,col]<-value
+    }
+}
+
+colnames(df)<- c("Words","B1","B2","B3","B4","B5","B6","B7","B8","B9","B10","B11","B12","B13",
+"B14","B15","B16","B17","B18","B19","B20","B21","B22","B23","B24","B25")
+
+#prep the dataframe for gridplotting
+df.plot<-df
+df.plot<- melt(df.plot, id.vars = "Words")
+colnames(df.plot)[2]<- "Books"
+
+gridplot <- ggplot(df.plot,aes(x=Books,y=Words,fill=value)) + geom_tile() +
+scale_fill_gradient(low = "white", high = "steelblue") +
+coord_flip() +
+theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+gridplot
+
+#save graph:
+ggsave(filename=paste0(paste0("../",DIRECTORY,"/","PostProc","/"),
+"WordsPresentC_gridplot.pdf"),device = "pdf", plot = gridplot,
+scale = 1, width = 350, height = 20, units = "cm", dpi = 300, limitsize = FALSE)
+
+## For pda500:
+
+gridplot <- ggplot(df.plot,aes(x=Books,y=Words,fill=value)) + geom_tile() +
+scale_fill_gradient(low = "white", high = "steelblue")
+#coord_flip() +
+#theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+
+gridplot
+
+#save graph:
+ggsave(filename=paste0(paste0("../",DIRECTORY,"/","PostProc","/"),
+"WordsPresent_gridplot.pdf"),device = "pdf", plot = gridplot,
+scale = 1, width = 100, height = 15, units = "cm", dpi = 300, limitsize = TRUE)
+
+#---
+## For pda1710:
+
+#prep wordlist
+wordlist <- wordlist[-(372)] ## need to remove "extraction method: principal component analysis." from wordlist
+length(wordlist)
+
+#save graph:
+ggsave(filename=paste0(paste0("../",DIRECTORY,"/","PostProc","/"),
+"WordsPresent_gridplot.pdf"),device = "pdf", plot = gridplot,
+scale = 1, width = 350, height = 20, units = "cm", dpi = 300, limitsize = FALSE)
+
+##---
+
+######-----------------------------------------------
 
