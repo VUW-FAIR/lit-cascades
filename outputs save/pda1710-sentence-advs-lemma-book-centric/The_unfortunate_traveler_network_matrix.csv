@@ -1,26 +1,20 @@
-"" "clownish" "curious" "eager" "effeminate" "eloquent" "heroicall" "humble" "ignorant" "narrow" "negligent" "particular" "simple" "tame" "dull" "passionate" "thorough" "vaine" "womanly" "spirited" "merciful" "rough" "zealous" "questiond" "simples" "wilde"
-"clownish" 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0
-"curious" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0
-"eager" 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0
-"effeminate" 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0
-"eloquent" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0
-"heroicall" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0
-"humble" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0
-"ignorant" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0
-"narrow" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0
-"negligent" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0
-"particular" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0
-"simple" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 1 0
-"tame" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
-"dull" 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-"passionate" 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-"thorough" 0 0 1 1 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0
-"vaine" 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-"womanly" 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-"spirited" 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-"merciful" 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-"rough" 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-"zealous" 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-"questiond" 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-"simples" 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0
-"wilde" 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0
+"" "amorous" "blasphemous" "bright" "capable" "contented" "eager" "forcible" "gracious" "ignorant" "merciful" "pleasant" "quick" "reasonable" "wise" "bold" "gentle" "superstitious" "malicious" "rough"
+"amorous" 0 0 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0 0 0
+"blasphemous" 0 0 0 0 0 0 0 1 0 0 0 1 0 0 1 1 1 0 0
+"bright" 0 0 0 0 0 1 0 0 0 0 1 0 1 1 0 0 0 0 0
+"capable" 0 0 0 0 0 0 1 0 1 0 0 0 0 0 0 0 0 1 0
+"contented" 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0
+"eager" 1 0 1 0 0 0 0 0 0 0 1 0 1 2 0 0 0 0 0
+"forcible" 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 1 0
+"gracious" 0 1 0 0 0 0 0 0 0 0 0 1 0 0 0 0 1 0 0
+"ignorant" 0 0 0 1 1 0 1 0 0 0 0 0 0 0 0 0 0 1 0
+"merciful" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
+"pleasant" 0 0 1 0 0 1 0 0 0 0 0 0 1 1 0 0 0 0 0
+"quick" 0 1 0 0 0 0 0 1 0 0 0 0 0 0 0 0 1 0 0
+"reasonable" 0 0 1 0 0 1 0 0 0 0 1 0 0 1 0 0 0 0 0
+"wise" 1 0 1 0 0 2 0 0 0 0 1 0 1 0 0 0 0 0 0
+"bold" 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+"gentle" 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+"superstitious" 0 1 0 0 0 0 0 1 0 0 0 1 0 0 0 0 0 0 0
+"malicious" 0 0 0 1 0 0 1 0 1 0 0 0 0 0 0 0 0 0 0
+"rough" 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0
