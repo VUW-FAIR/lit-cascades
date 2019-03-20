@@ -1,0 +1,17 @@
+CC - conjunctios
+CD - cardinal
+DT - determiner
+FW - foreign words
+IN - preposition
+JJ, JJR, JJS - Adjectives
+MD - Modal Auxiliary
+NN, NNS - Noun(s)
+NNP, NNPS - Proper Noun(s)
+PDT - pre-determiner
+POS - genitive marker
+PRP, PRP$ - pronoun (personal + possessive)
+RB, RBR, RBS - adverb (comparitive, superlative)
+RP - particle
+UH - interjection
+VB, VBD, VBG, VBN, VBP, VBZ - Verbs
+WDT, WP, WP$, WRB - Interrogatives

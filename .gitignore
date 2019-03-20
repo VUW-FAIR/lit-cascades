@@ -43,6 +43,7 @@ vignettes/*.pdf
 *.exe
 *.o
 *.so
+*.class
 
 # Packages #
 ############
@@ -72,3 +73,4 @@ vignettes/*.pdf
 .Trashes
 ehthumbs.db
 Thumbs.db
+*.bat
