@@ -2,7 +2,7 @@ library(tidyverse)
 
 library(gridExtra)
 
-setwd("/Users/mlr/OneDrive - Victoria University of Wellington - STAFF/Git/tic-personality-words/outputs save/pda1710-sentence-advs-lemma-book-centric/")
+setwd("/Users/mlr/OneDrive - Victoria University of Wellington - STAFF/Git/tic-personality-words/outputs save/pda500-1000words-advs-lemma-book-centric/")
 
 # Function ----------------------------------------------------------------
 plot_cluster <- function(data, var_cluster, palette)  
@@ -57,7 +57,7 @@ getClusterNumber <- function(dat, percent =.05){
 
 
 
-tsne_plotting <- function(tsn_list, percent = .05){
+tsne_plotting <- function(tsn_list){
   
   for(number in 1:length(tsn_list)){
     d_tsne_1 <- as.data.frame(tsn_list[[number]]$Y) 
@@ -78,10 +78,10 @@ tsne_plotting <- function(tsn_list, percent = .05){
     d_tsne_1_original$cl_kmeans <- factor(fit_cluster_kmeans$cluster)
     
     ## Creating hierarchical cluster model, and assigning the result to the data used to create the tsne
-    fit_cluster_hierarchical <- hclust(dist(scale(d_tsne_1[-3])))
+    #fit_cluster_hierarchical <- hclust(dist(scale(d_tsne_1[-3])))
     
     ## setting 3 clusters as output
-    d_tsne_1_original$cl_hierarchical <-  factor(cutree(fit_cluster_hierarchical, k = fit_cluster_kmeans$bestk)) 
+    #d_tsne_1_original$cl_hierarchical <-  factor(cutree(fit_cluster_hierarchical, k = fit_cluster_kmeans$bestk)) 
     
     #plot_k <- plot_cluster(d_tsne_1_original, "cl_kmeans", "Paired")  
     #plot_h <- plot_cluster(d_tsne_1_original, "cl_hierarchical", "Paired")
@@ -396,17 +396,17 @@ for(bb in 1:length(cooc)){
   cooc[[bb]][,1] <- NULL
   
   # rare co-occurring terms
-  rareT <- which(rowSums(cooc[[bb]]) <= ceiling(max(rowSums(cooc[[bb]])) * .15))
+  #rareT <- which(rowSums(cooc[[bb]]) <= ceiling(max(rowSums(cooc[[bb]])) * .15))
   # frequent co-occ terms
-  freqT <- which(rowSums(cooc[[bb]]) > ceiling(max(rowSums(cooc[[bb]])) * .15))
+  #freqT <- which(rowSums(cooc[[bb]]) > ceiling(max(rowSums(cooc[[bb]])) * .15))
   # rare terms only co-occurring with rare terms
-  finalRare <- which(colSums(cooc[[bb]][freqT,]) == 0)
+  #finalRare <- which(colSums(cooc[[bb]][freqT,]) == 0)
   
-  cooc[[bb]] <- cooc[[bb]][-finalRare,-finalRare]
+  #cooc[[bb]] <- cooc[[bb]][-finalRare,-finalRare]
   
-  if(length(which(rowSums(cooc[[bb]])==0)) > 0){
-    cooc[[bb]] <- cooc[[bb]][-(which(rowSums(cooc[[bb]])==0)),-(which(rowSums(cooc[[bb]])==0))]
-  }
+  #if(length(which(rowSums(cooc[[bb]])==0)) > 0){
+  #  cooc[[bb]] <- cooc[[bb]][-(which(rowSums(cooc[[bb]])==0)),-(which(rowSums(cooc[[bb]])==0))]
+  #}
   #cooc[[bb]] <- cooc[[bb]][-which(rowSums(cooc[[bb]]) < ceiling(max(rowSums(cooc[[bb]])) * .10)),
   #                         -which(colSums(cooc[[bb]]) < ceiling(max(colSums(cooc[[bb]])) * .10))]
   
@@ -417,7 +417,7 @@ names_list <- list()
 for(sent in cooc){
 
   test <- Rtsne::Rtsne(sent,check_duplicates=FALSE,
-                     pca=TRUE, perplexity = floor(length(rowSums(sent))/3)-1, theta=0.1, dims=2)
+                     pca=TRUE, perplexity = max(1,floor(length(rowSums(sent))/3)-1), theta=0, dims=2)
   
   #plot(test$Y)
   #text(test$Y, labels=rownames(sent))
