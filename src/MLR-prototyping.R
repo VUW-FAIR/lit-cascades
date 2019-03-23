@@ -58,7 +58,7 @@ for (sent in cooc) {
                        theta=0, dims=2)
   #withkmeans
   fit_cluster_kmeans <- fpc::kmeansruns(test$Y,krange=2:(nrow(sent)/2),critout=F,runs=5,criterion="ch")
-  write.csv2(data.frame(clusters=fit_cluster_kmeans$cluster),paste0(gsub("\\_links\\.csv","",alllinks[[index]]),"-TSNE-cluster.csv"), row.names = F, col.names = F, sep = ";")
+  write.csv2(data.frame(terms=rownames(sent),clusters=fit_cluster_kmeans$cluster),paste0(gsub("\\_links\\.csv","",alllinks[[index]]),"-TSNE-cluster.csv"), row.names = F, col.names = F, sep = ";")
   #with dbscan
   #ds <- dbscan::dbscan(scale(test$Y), 20)
   #cc <- randomcoloR::distinctColorPalette(max(ds$cluster))
@@ -263,7 +263,7 @@ for (sent in cooc) {
   #withkmeans
   fit_cluster_kmeans <- fpc::kmeansruns(test$Y,krange=2:(nrow(sent)/2),critout=F,runs=5,criterion="ch")
   
-  write.csv2(data.frame(clusters=fit_cluster_kmeans$cluster),paste0(gsub("\\_links\\.csv","",alllinks[[index]]),"-TSNE-cluster.csv"), row.names = F, col.names = F, sep = ";")
+  write.csv2(data.frame(terms=rownames(sent),clusters=fit_cluster_kmeans$cluster),paste0(gsub("\\_links\\.csv","",alllinks[[index]]),"-TSNE-cluster.csv"), row.names = F, col.names = F, sep = ";")
   #with dbscan
   #ds <- dbscan::dbscan(scale(test$Y), 20)
   #cc <- randomcoloR::distinctColorPalette(max(ds$cluster))
