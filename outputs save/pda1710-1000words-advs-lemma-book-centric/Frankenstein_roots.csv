@@ -51,8 +51,8 @@
 "19" "quick"
 "19" "serene"
 "19" "unrestrained"
-"20" "capable"
-"20" "cheerful"
+"20" NA
+"20" "20"
 "21" NA
 "21" "21"
 "22" NA
@@ -102,6 +102,7 @@
 "41" "41"
 "42" NA
 "42" "42"
+"43" "cheerful"
 "44" NA
 "44" "44"
 "45" "amiable"
@@ -119,6 +120,7 @@
 "48" NA
 "48" "48"
 "49" "bitter"
+"49" "capable"
 "49" "confused"
 "49" "dependent"
 "49" "distant"

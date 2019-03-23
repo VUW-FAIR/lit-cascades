@@ -121,14 +121,8 @@
 "46" "46"
 "47" NA
 "47" "47"
-"48" "bland"
-"48" "deep"
-"48" "definite"
-"48" "eager"
-"48" "hearty"
-"48" "irrepressible"
-"48" "nervous"
-"48" "underhanded"
+"48" NA
+"48" "48"
 "49" NA
 "49" "49"
 "50" NA
@@ -364,6 +358,7 @@
 "158" "158"
 "159" NA
 "159" "159"
+"160" "deep"
 "160" "incautious"
 "160" "wild"
 "161" NA
@@ -428,6 +423,7 @@
 "189" "189"
 "190" "autocratic"
 "190" "blunt"
+"190" "eager"
 "190" "submissive"
 "191" NA
 "191" "191"
@@ -528,8 +524,13 @@
 "237" "friendly"
 "238" NA
 "238" "238"
-"239" NA
-"239" "239"
+"239" "congenial"
+"239" "formal"
+"239" "insolent"
+"239" "jealous"
+"239" "peaceful"
+"239" "sloppy"
+"239" "slow"
 "240" NA
 "240" "240"
 "241" NA
@@ -744,7 +745,6 @@
 "342" NA
 "342" "342"
 "343" "sarcastic"
-"343" "sloppy"
 "344" NA
 "344" "344"
 "345" NA

@@ -294,8 +294,12 @@
 "124" "124"
 "125" NA
 "125" "125"
-"126" NA
-"126" "126"
+"126" "animated"
+"126" "childish"
+"126" "practical"
+"126" "sensitive"
+"126" "slow"
+"126" "unwary"
 "127" "energetic"
 "127" "foolish"
 "127" "severe"
@@ -429,7 +433,6 @@
 "186" "186"
 "187" NA
 "187" "187"
-"188" "childish"
 "188" "proper"
 "188" "warm"
 "189" NA
@@ -574,7 +577,6 @@
 "259" NA
 "259" "259"
 "260" "genial"
-"260" "practical"
 "261" NA
 "261" "261"
 "262" NA
@@ -732,13 +734,11 @@
 "341" "sulky"
 "341" "surly"
 "341" "treacherous"
-"341" "unwary"
 "341" "vocal"
 "342" NA
 "342" "342"
-"343" "indefinite"
-"343" "nervous"
-"343" "steady"
+"343" NA
+"343" "343"
 "344" "punctual"
 "344" "transparent"
 "344" "uncharitable"

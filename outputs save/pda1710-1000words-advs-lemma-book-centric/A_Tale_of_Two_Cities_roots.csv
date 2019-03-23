@@ -3,8 +3,17 @@
 "1" "1"
 "2" NA
 "2" "2"
-"3" NA
-"3" "3"
+"3" "cold"
+"3" "emphatic"
+"3" "genial"
+"3" "mutinous"
+"3" "negative"
+"3" "nervous"
+"3" "particular"
+"3" "shy"
+"3" "slow"
+"3" "stable"
+"3" "wary"
 "4" NA
 "4" "4"
 "5" NA
@@ -31,7 +40,6 @@
 "15" "15"
 "16" NA
 "16" "16"
-"17" "cold"
 "18" NA
 "18" "18"
 "19" NA
@@ -138,8 +146,11 @@
 "66" "66"
 "67" NA
 "67" "67"
-"68" NA
-"68" "68"
+"68" "honest"
+"68" "maternal"
+"68" "narrow"
+"68" "superstitious"
+"68" "unfeeling"
 "69" NA
 "69" "69"
 "70" NA
@@ -220,7 +231,6 @@
 "101" "extravagant"
 "101" "judicious"
 "101" "loud"
-"101" "particular"
 "101" "strict"
 "102" NA
 "102" "102"
@@ -296,7 +306,6 @@
 "135" "warm"
 "136" "doleful"
 "136" "exact"
-"137" "stable"
 "137" "timid"
 "137" "violent"
 "138" "negligent"

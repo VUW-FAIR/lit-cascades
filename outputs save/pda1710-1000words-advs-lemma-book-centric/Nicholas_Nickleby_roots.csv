@@ -44,14 +44,19 @@
 "14" "14"
 "15" NA
 "15" "15"
-"16" NA
-"16" "16"
+"16" "affirmative"
+"16" "agreeable"
+"16" "anxious"
+"16" "foolish"
+"16" "natural"
+"16" "religious"
+"16" "rough"
+"16" "slow"
 "17" NA
 "17" "17"
 "18" NA
 "18" "18"
 "19" "affectionate"
-"19" "anxious"
 "19" "bitter"
 "19" "brisk"
 "19" "good-natured"
@@ -116,7 +121,6 @@
 "45" "45"
 "46" NA
 "46" "46"
-"47" "agreeable"
 "47" "conversational"
 "47" "fearful"
 "47" "irrepressible"
@@ -133,7 +137,6 @@
 "50" "immovable"
 "50" "independent"
 "50" "proper"
-"50" "rough"
 "50" "serious"
 "50" "unreasonable"
 "51" NA
@@ -231,9 +234,8 @@
 "97" "97"
 "98" NA
 "98" "98"
-"99" "exact"
-"99" "meek"
-"99" "sarcastic"
+"99" NA
+"99" "99"
 "100" NA
 "100" "100"
 "101" NA
@@ -260,7 +262,6 @@
 "111" NA
 "111" "111"
 "112" "elegant"
-"112" "natural"
 "113" NA
 "113" "113"
 "114" NA
@@ -270,7 +271,6 @@
 "116" NA
 "116" "116"
 "117" "#-particular"
-"117" "foolish"
 "117" "quiet"
 "117" "severe"
 "117" "sparkling"
@@ -533,8 +533,7 @@
 "243" "243"
 "244" NA
 "244" "244"
-"245" NA
-"245" "245"
+"245" "sullen"
 "246" NA
 "246" "246"
 "247" NA
@@ -590,8 +589,11 @@
 "272" "272"
 "273" NA
 "273" "273"
-"274" NA
-"274" "274"
+"274" "certain"
+"274" "eager"
+"274" "flighty"
+"274" "friendly"
+"274" "sluggish"
 "275" NA
 "275" "275"
 "276" NA
@@ -668,6 +670,7 @@
 "313" NA
 "313" "313"
 "314" "deliberate"
+"314" "exact"
 "314" "kind"
 "314" "wise"
 "315" NA
@@ -706,7 +709,6 @@
 "332" "vague"
 "333" NA
 "333" "333"
-"334" "certain"
 "334" "dogged"
 "334" "fiery"
 "334" "jealous"
