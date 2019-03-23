@@ -71,7 +71,7 @@ tsne_plotting <- function(tsn_list){
     ## Creating k-means clustering model, and assigning the result to the data used to create the tsne
     #print(components_number)
     #fit_cluster_kmeans <-  kmeans(scale(d_tsne_1[-3]), components_number)  
-    fit_cluster_kmeans <- fpc::kmeansruns(scale(d_tsne_1[-3]),krange=2:(nrow(d_tsne_1)/2),critout=F,runs=5,criterion="ch")
+    fit_cluster_kmeans <- fpc::kmeansruns(d_tsne_1[-3],krange=2:(nrow(d_tsne_1)/2),critout=F,runs=5,criterion="ch")
     
     colpal <- randomcoloR::distinctColorPalette(fit_cluster_kmeans$bestk)
     
