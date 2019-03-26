@@ -21,7 +21,7 @@
 # under the License.
 
 #set working directoy
-setwd("/home/STAFF/luczakma/RProjects/tic-personality-words/")
+setwd("/Users/mlr/OneDrive - Victoria University of Wellington - STAFF/Git/tic-personality-words/")
 
 #Rprof(profile_out <- "profile.txt")
 
@@ -147,6 +147,7 @@ for(sliceSize in list(1000,"sentence")){
     
     #trait_words <- gsub("\\s*", "", tolower(readLines('resources/Personal Traits.txt')))
     #trait_words <- tolower(readLines('resources/pda500.txt'))
+    spacyr::spacy_initialize()
     trait_words <- unique(tolower(readLines('resources/pda1710_no_abbreviation.csv')))
     outer_lapply <- lapply(words300B, function(xx){
       result = tryCatch({
@@ -157,12 +158,19 @@ for(sliceSize in list(1000,"sentence")){
         #  xx <- toString(tm[[1]]$content)
         #}
         
-        annotation <- coreNLP::annotateString(xx)
-        tokens <- coreNLP::getToken(annotation)
-        Deps <- coreNLP::getDependency(annotation, type = "basic")
+        #annotation <- coreNLP::annotateString(xx)
+        annotation <- spacyr::spacy_parse(xx,tag=T,dependency=T)
+        negs <- annotation[annotation$dep_rel == "neg",]
+        neg_deps <- c()
+        for(ne in 1:nrow(negs)){
+          neg_deps <- c(neg_deps, annotation[which(annotation$sentence_id==negs[ne,2] & annotation$token_id==negs[ne,8]),4])
+        }
+        #tokens <- coreNLP::getToken(annotation)
+        #Deps <- coreNLP::getDependency(annotation, type = "basic")
         #Coref <- coreNLP::getCoreference(annotation)
-        neg_deps <- Deps[Deps$type == "neg",]$governor
-        advs <- tokens[tokens$POS == "JJ" | tokens$POS == "JJS" | tokens$POS == "JJR",c("lemma","token")]
+        #neg_deps <- Deps[Deps$type == "neg",]$governor
+        #advs <- tokens[tokens$POS == "JJ" | tokens$POS == "JJS" | tokens$POS == "JJR",c("lemma","token")]
+        advs <- annotation[annotation$pos == "ADJ",c("lemma","token")]
         if(allwords){
           xx <- gsub(",|\\.|;|:|\\'\\\\\"",'', xx)
           xx <- unlist(strsplit(xx, split = ' '))
@@ -179,21 +187,19 @@ for(sliceSize in list(1000,"sentence")){
           traitwords_out_lem <- xx_lem[which(!is.na(matched))]
         }
         
-        
         ## Replacing lemmatised word with token word to allow for matching of negative dependencies
         #traitwords_out[which(traitwords_out == tokens$lemma[which(traitwords_out == tokens$lemma)])] <- tolower(tokens$token[which(tokens$lemma == traitwords_out)])
-        traitwords_out[which(traitwords_out_lem %in% neg_deps)] <- tolower(paste0("#-",traitwords_out[which(traitwords_out_lem %in% neg_deps)]))
+        traitwords_out[which(traitwords_out %in% neg_deps)] <- tolower(paste0("#-",traitwords_out[which(traitwords_out %in% neg_deps)]))
         rm(annotation)
-        rm(tokens)
-        rm(Deps)
+        #rm(tokens)
+        #rm(Deps)
         rm(neg_deps)
         rm(advs)
         gc()
-        traitwords_out
-        
+        return(traitwords_out)
       }, warning = function(warning_condition) {}, error = function(error_condition) {}, finally={})
     })
-    
+    spacyr::spacy_finalize()
     
     unique_trait <- lapply(outer_lapply, function(tt){
       paste(sort(unique(unlist(tt))), collapse = ", ")
