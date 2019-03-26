@@ -191,32 +191,6 @@ for (sent in cooc) {
   
 }
 
-
-library(igraph)
-library(threejs)
-g <- igraph::graph.edgelist(as.matrix(data.frame(from=as.character(link[[1]][,1]),to=as.character(link[[1]][,2]))), directed=F)
-g <- g - E(g)
-graph_list <- list()
-
-labels <- c()
-
-for(j in 1:nrow(link[[1]])){
-  foo <- g
-  labels<-c(labels,link[[1]][j,1],link[[1]][j,2])
-  for(k in (j-1):0){
-    foo <- foo + edge(as.character(link[[1]][j-k,1]),as.character(link[[1]][j-k,2]))
-  }
-  graph_list[[j]] <- foo
-}
-labels <- unique(labels)
-V(g)$label <- paste0(labels, " - ",node[[1]]$tags[labels])
-threejs::graphjs(graph_list, vertex.label=paste0(labels, " - ",node[[1]]$tags[labels]),
-                 fpl=50, repulsion = 0.3, curvature = 0.4, bg="black", fg="white")
-
-
-
-
-
 ### FOR 1710
 
 
@@ -347,6 +321,14 @@ for (sent in cooc) {
   tO<-c(0)
   tNN<-c(0)
   
+  nod <- node[[index]]
+  nod$A <- 0
+  nod$C <- 0
+  nod$E <- 0
+  nod$N <- 0
+  nod$O <- 0
+  nod$NN <- 0
+  
   for(i in 1:nrow(node[[index]])){
     nodeTraits <- as.data.frame(unlist(str_split(node[[index]][i,2],", ")),stringsAsFactors = F)
     colnames(nodeTraits)<-c("words")
@@ -358,11 +340,17 @@ for (sent in cooc) {
     cnt_tbl <- plyr::count(nodeTraits$trait)
     
     tA <- c(tA,ifelse(length(cnt_tbl[which(cnt_tbl$x=="A"),2]>0), tA[length(tA)] + cnt_tbl[which(cnt_tbl$x=="A"),2], tA[length(tA)]))
+    nod$A[i] <- tA[i+1]
     tC <- c(tC,ifelse(length(cnt_tbl[which(cnt_tbl$x=="C"),2]>0), tC[length(tC)] + cnt_tbl[which(cnt_tbl$x=="C"),2], tC[length(tC)]))
+    nod$C[i] <- tC[i+1]
     tE <- c(tE,ifelse(length(cnt_tbl[which(cnt_tbl$x=="E"),2]>0), tE[length(tE)] + cnt_tbl[which(cnt_tbl$x=="E"),2], tE[length(tE)]))
+    nod$E[i] <- tE[i+1]
     tN <- c(tN,ifelse(length(cnt_tbl[which(cnt_tbl$x=="N"),2]>0), tN[length(tN)] + cnt_tbl[which(cnt_tbl$x=="N"),2], tN[length(tN)]))
+    nod$N[i] <- tN[i+1]
     tO <- c(tO,ifelse(length(cnt_tbl[which(cnt_tbl$x=="O"),2]>0), tO[length(tO)] + cnt_tbl[which(cnt_tbl$x=="O"),2], tO[length(tO)]))
+    nod$O[i] <- tO[i+1]
     tNN <- c(tNN,ifelse(length(cnt_tbl[which(cnt_tbl$x=="N.N."),2]>0), tNN[length(tNN)] + cnt_tbl[which(cnt_tbl$x=="N.N."),2], tNN[length(tNN)]))
+    nod$NN[i] <- tNN[i+1]
     
   }
   tA <- as.data.frame(tA)
@@ -406,8 +394,54 @@ for (sent in cooc) {
     ggtitle(gsub("\\_links\\.csv","",alllinks[[index]]))
   ggplot2::ggsave(paste0(gsub("\\_links\\.csv","",alllinks[[index]]),"_node_traits.jpg"),plot=plo,device="jpeg")
   
-  
-  
+  ## time series analysis of traits
+  ts1 <- zoo::zoo(nod$A)
+  #ts1_rate <- log(ts1 / stats::lag(ts1))
+  ts1_rate <- diff(ts1)
+  ts2 <- zoo::zoo(nod$C)
+  #ts2_rate <- log(ts2 / stats::lag(ts2))
+  ts2_rate <- diff(ts2)
+  lmtest::grangertest(ts1_rate ~ ts2_rate, order = 1)
 }
 
+
+
+
+
+library(igraph)
+library(threejs)
+g <- igraph::graph.edgelist(as.matrix(data.frame(from=as.character(link[[1]][,1]),to=as.character(link[[1]][,2]))), directed=F)
+g <- g - E(g)
+graph_list <- list()
+
+labels <- c()
+
+for(j in 1:nrow(link[[1]])){
+  foo <- g
+  labels<-c(labels,link[[1]][j,1],link[[1]][j,2])
+  for(k in (j-1):0){
+    foo <- foo + edge(as.character(link[[1]][j-k,1]),as.character(link[[1]][j-k,2]))
+  }
+  graph_list[[j]] <- foo
+}
+labels <- unique(labels)
+V(g)$label <- paste0(labels, " - ",node[[1]]$tags[labels])
+threejs::graphjs(graph_list, vertex.label=paste0(labels, " - ",node[[1]]$tags[labels]),
+                 fpl=50, repulsion = 0.3, curvature = 0.4, bg="black", fg="white")
+
+
+
+### recurrence
+lnk <- link[[23]]
+nod <- node[[23]]
+wordTrait <- read.table("../../resources/pda1710_no_abbreviation_loadings_categories.csv",sep=",",header = T)
+wordTrait$Word<-tolower(wordTrait$Word)
+
+#add the max trait variable without loading threshold
+wordTrait$maxValTrait <- ""
+wordTrait$thresholdValTrait <- ""
+for(i in 1:nrow(wordTrait)){
+  wordTrait$maxValTrait[i] <- names(which.max(abs(wordTrait[i,5:9])))
+  wordTrait$thresholdValTrait[i] <- ifelse(length(which(abs(wordTrait[i,5:9])>.25))>0,names(which.max(abs(wordTrait[i,5:9]))),"")
+}
 

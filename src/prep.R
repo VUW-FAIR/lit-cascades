@@ -26,11 +26,11 @@ setwd("/home/STAFF/luczakma/RProjects/tic-personality-words/")
 #Rprof(profile_out <- "profile.txt")
 
 #import libs
-#coreNLP::initCoreNLP(type = c("english"),mem="64g")
+#coreNLP::initCoreNLP(type = c("english"),mem="96g")
 
 #housekeeping and helpers
 options(scipen = 999)
-allwords <- TRUE
+allwords <- FALSE
 stemTrait <- FALSE
 # Functions ---------------------------------------------------------------
 
@@ -82,7 +82,9 @@ tic_generate <- function(inputsequence) {
 #get all text and char files
 allTextFiles <- list.files("resources/Text Files")
 
-for(sliceSize in list("sentence")){
+#for(sliceSize in list("sentence")){
+#for(sliceSize in list(1000)){
+for(sliceSize in list(1000,"sentence")){
   dir.create(file.path("resources/output/", sliceSize), showWarnings = FALSE)
   
   for(nextRun in 1:length(allTextFiles)){
@@ -98,13 +100,13 @@ for(sliceSize in list("sentence")){
     #split by number of words and chapters
     if(is.numeric(sliceSize)){
       full_text <- strsplit(processedText, "(?i:Chapter [0-9A-Z]+[\\.]?[\\s.]?)", perl=T)[[1]]
-      corpus <- tm::VCorpus(tm::VectorSource(processedText))
-      corpus <- tm::tm_map(corpus, tm::content_transformer(tm::removePunctuation))
-      corpus <- tm::tm_map(corpus, tm::content_transformer(tm::removeNumbers))
-      tdm <- as.matrix(tm::TermDocumentMatrix(corpus,
-                                              control = list(wordLength = c(3, Inf))))
-      random500 <- sample(rownames(tdm), 500)
-      readr::write_lines(random500, paste0("resources/output/", theSource,"_random.csv"))
+      #corpus <- tm::VCorpus(tm::VectorSource(processedText))
+      #corpus <- tm::tm_map(corpus, tm::content_transformer(tm::removePunctuation))
+      #corpus <- tm::tm_map(corpus, tm::content_transformer(tm::removeNumbers))
+      #tdm <- as.matrix(tm::TermDocumentMatrix(corpus,
+      #                                        control = list(wordLength = c(3, Inf))))
+      #random500 <- sample(rownames(tdm), 500)
+      #readr::write_lines(random500, paste0("resources/output/", theSource,"_random.csv"))
       words300B <- c()
       tmp <- lapply(full_text, function(x){
         snippet <- strsplit(x, "\\s+")[[1]]
@@ -117,7 +119,9 @@ for(sliceSize in list("sentence")){
       })
       for(s in 1:length(tmp)){
         if(length(tmp[[s]]) > 0){
-          words300B <- c(words300B,tmp[[s]])
+          for(t in 1:length(tmp[[s]])){
+            words300B <- c(words300B,paste(unlist(tmp[[s]][t]),collapse = " "))
+          }
         }
       }
       rm(tmp)
@@ -142,34 +146,43 @@ for(sliceSize in list("sentence")){
     #trait_words <- tolower(readLines(paste0("resources/output/",theSource,"_random.csv")))
     
     #trait_words <- gsub("\\s*", "", tolower(readLines('resources/Personal Traits.txt')))
-    trait_words <- tolower(readLines('resources/pda500.txt'))
-    #trait_words <- tolower(readLines('resources/pda1710.txt'))
+    #trait_words <- tolower(readLines('resources/pda500.txt'))
+    trait_words <- unique(tolower(readLines('resources/pda1710_no_abbreviation.csv')))
     outer_lapply <- lapply(words300B, function(xx){
       result = tryCatch({
         
-        if(stemTrait){
-          tm <- tm::Corpus(tm::VectorSource(xx))
-          tm <- tm::tm_map(tm, tm::stemDocument)
-          xx <- tm[[1]]$content
-        }
+        #if(stemTrait){
+        #  tm <- tm::Corpus(tm::VectorSource(xx))
+        #  tm <- tm::tm_map(tm, tm::stemDocument)
+        #  xx <- toString(tm[[1]]$content)
+        #}
         
         annotation <- coreNLP::annotateString(xx)
         tokens <- coreNLP::getToken(annotation)
         Deps <- coreNLP::getDependency(annotation, type = "basic")
         #Coref <- coreNLP::getCoreference(annotation)
         neg_deps <- Deps[Deps$type == "neg",]$governor
-        advs <- tokens[tokens$POS == "JJ",c("lemma","token")]
+        advs <- tokens[tokens$POS == "JJ" | tokens$POS == "JJS" | tokens$POS == "JJR",c("lemma","token")]
         if(allwords){
           xx <- gsub(",|\\.|;|:|\\'\\\\\"",'', xx)
           xx <- unlist(strsplit(xx, split = ' '))
         } else{
-          xx <- advs$lemma
+          xx <- tolower(advs$token)
+          xx_lem <- advs$lemma
         }
-        matched <- match(trait_words,xx)
-        traitwords_out <- trait_words[which(!is.na(matched))]
+        if(stemTrait){
+          matched <- pmatch(trait_words,xx)
+          traitwords_out <- xx[matched[which(!is.na(matched))]]
+        } else{
+          matched <- match(xx,trait_words)
+          traitwords_out <- xx[which(!is.na(matched))]
+          traitwords_out_lem <- xx_lem[which(!is.na(matched))]
+        }
+        
+        
         ## Replacing lemmatised word with token word to allow for matching of negative dependencies
-        traitwords_out[which(traitwords_out == tokens$lemma[which(traitwords_out == tokens$lemma)])] <- tolower(tokens$token[which(tokens$lemma == traitwords_out)])
-        traitwords_out[which(traitwords_out %in% neg_deps)] <- tolower(paste0("#-",traitwords_out[which(traitwords_out %in% neg_deps)]))
+        #traitwords_out[which(traitwords_out == tokens$lemma[which(traitwords_out == tokens$lemma)])] <- tolower(tokens$token[which(tokens$lemma == traitwords_out)])
+        traitwords_out[which(traitwords_out_lem %in% neg_deps)] <- tolower(paste0("#-",traitwords_out[which(traitwords_out_lem %in% neg_deps)]))
         rm(annotation)
         rm(tokens)
         rm(Deps)
