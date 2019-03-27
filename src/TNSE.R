@@ -2,7 +2,7 @@ library(tidyverse)
 
 library(gridExtra)
 
-setwd("/Users/mlr/OneDrive - Victoria University of Wellington - STAFF/Git/tic-personality-words/outputs save/pda1710-1000words-advs-lemma-book-centric/")
+setwd("/Users/mlr/OneDrive - Victoria University of Wellington - STAFF/Git/tic-personality-words/outputs save/pda500-1000words-advs-lemma-book-centric/")
 
 # Function ----------------------------------------------------------------
 plot_cluster <- function(data, var_cluster, palette)  

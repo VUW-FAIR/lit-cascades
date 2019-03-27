@@ -82,9 +82,9 @@ tic_generate <- function(inputsequence) {
 #get all text and char files
 allTextFiles <- list.files("resources/Text Files")
 
-#for(sliceSize in list("sentence")){
+for(sliceSize in list("sentence")){
 #for(sliceSize in list(1000)){
-for(sliceSize in list(1000,"sentence")){
+#for(sliceSize in list(1000,"sentence")){
   dir.create(file.path("resources/output/", sliceSize), showWarnings = FALSE)
   
   for(nextRun in 1:length(allTextFiles)){
@@ -146,9 +146,9 @@ for(sliceSize in list(1000,"sentence")){
     #trait_words <- tolower(readLines(paste0("resources/output/",theSource,"_random.csv")))
     
     #trait_words <- gsub("\\s*", "", tolower(readLines('resources/Personal Traits.txt')))
-    #trait_words <- tolower(readLines('resources/pda500.txt'))
+    trait_words <- tolower(readLines('resources/pda500.txt'))
     spacyr::spacy_initialize()
-    trait_words <- unique(tolower(readLines('resources/pda1710_no_abbreviation.csv')))
+    #trait_words <- unique(tolower(readLines('resources/pda1710_no_abbreviation.csv')))
     outer_lapply <- lapply(words300B, function(xx){
       result = tryCatch({
         

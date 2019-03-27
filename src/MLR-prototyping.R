@@ -395,13 +395,13 @@ for (sent in cooc) {
   ggplot2::ggsave(paste0(gsub("\\_links\\.csv","",alllinks[[index]]),"_node_traits.jpg"),plot=plo,device="jpeg")
   
   ## time series analysis of traits
-  ts1 <- zoo::zoo(nod$A)
+  #ts1 <- zoo::zoo(nod$A)
   #ts1_rate <- log(ts1 / stats::lag(ts1))
-  ts1_rate <- diff(ts1)
-  ts2 <- zoo::zoo(nod$C)
+  #ts1_rate <- diff(ts1)
+  #ts2 <- zoo::zoo(nod$C)
   #ts2_rate <- log(ts2 / stats::lag(ts2))
-  ts2_rate <- diff(ts2)
-  lmtest::grangertest(ts1_rate ~ ts2_rate, order = 1)
+  #ts2_rate <- diff(ts2)
+  #lmtest::grangertest(ts1_rate ~ ts2_rate, order = 1)
 }
 
 
