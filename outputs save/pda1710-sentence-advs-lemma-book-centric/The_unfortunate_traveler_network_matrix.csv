@@ -1,18 +1,32 @@
-"" "clownish" "curious" "eager" "effeminate" "humble" "ignorant" "narrow" "negligent" "simple" "dull" "passionate" "thorough" "spirited" "merciful" "rough" "zealous" "simples"
-"clownish" 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0
-"curious" 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0
-"eager" 0 0 0 1 0 0 0 0 0 0 0 1 0 0 0 0 0
-"effeminate" 0 0 1 0 0 0 0 0 0 0 0 1 0 0 0 0 0
-"humble" 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0
-"ignorant" 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0
-"narrow" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0
-"negligent" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0
-"simple" 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 1
-"dull" 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-"passionate" 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-"thorough" 0 0 1 1 0 0 0 0 1 0 0 0 0 0 0 0 0
-"spirited" 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0
-"merciful" 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0
-"rough" 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0
-"zealous" 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0
-"simples" 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0
+"" "amiable" "bright" "capable" "clownish" "cunning" "curious" "determined" "diligent" "dishonest" "eager" "headlong" "honest" "humble" "ignorant" "indifferent" "narrow" "negligent" "rough" "eloquent" "wise" "proper" "dull" "passionate" "gracious" "modest" "simple" "worldly" "spirited" "merciful" "mild" "zealous"
+"amiable" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0
+"bright" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0
+"capable" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0
+"clownish" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0
+"cunning" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+"curious" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0
+"determined" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0
+"diligent" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0
+"dishonest" 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+"eager" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0
+"headlong" 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+"honest" 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 0 0 0
+"humble" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0
+"ignorant" 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0
+"indifferent" 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0
+"narrow" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 1 0 0 0 0 0 0 0 0 0 0 0
+"negligent" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
+"rough" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0
+"eloquent" 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+"wise" 0 1 0 0 0 0 0 0 0 1 0 0 0 0 0 1 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0
+"proper" 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+"dull" 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+"passionate" 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+"gracious" 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+"modest" 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+"simple" 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+"worldly" 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+"spirited" 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+"merciful" 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+"mild" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+"zealous" 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0
