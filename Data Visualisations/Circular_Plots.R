@@ -7,7 +7,7 @@ setwd("/home/STAFF/cabautgr/projects/tic-personality-words/")
 getwd()
 setwd("..")
 
-DIRECTORY<-"pda1710-1000words-advs-lemma-book-centric"
+DIRECTORY<-"pda500-1000words-advs-lemma-book-centric"
 
 ## Creating a list with all co-ocurrence matrices for all outputs
 allmatrices <- list.files(paste0("outputs save/",DIRECTORY),
@@ -84,7 +84,7 @@ library(RColorBrewer)
 
 #Setting directory
 setwd("outputs save")
-DIRECTORY<-"pda1710-1000words-advs-lemma-book-centric"
+#DIRECTORY<-"pda1710-1000words-advs-lemma-book-centric"
 setwd(DIRECTORY)
 getwd()
 setwd("..") #if you would like to go back one directory
@@ -98,7 +98,7 @@ clusterscsv <- list(dir(pattern = "*-TSNE-cluster.csv"))
 ##do a loop here
 k<-1
 
-for(k in 11:length(cooc)){
+for(k in 1:length(cooc)){
     
     print(paste("mat: ",k))
     
@@ -169,7 +169,7 @@ for(k in 11:length(cooc)){
 
 #PREP THE MATRICES
 setwd("/home/STAFF/cabautgr/projects/tic-personality-words/")
-
+DIRECTORY<-"pda500-1000words-advs-lemma-book-centric"
 getwd()
 setwd("..")
 
@@ -197,7 +197,7 @@ for(bb in 1:length(cooc)){
     #   cooc[[bb]] <- cooc[[bb]][-(which(rowSums(cooc[[bb]])==0)),-(which(rowSums(cooc[[bb]])==0))]
 }
 
-}
+
 ##
 #mat<-cooc[[1]]
 #word frequency in matrix
@@ -237,8 +237,6 @@ count_cooc<-function(mat){
     
     return(v)
 }
-s<-count_cooc(mat)
-s
 
 
 #CIRCULAR GRAPHS
@@ -260,11 +258,11 @@ clusterscsv <- list(dir(pattern = "*-TSNE-cluster.csv"))
 
 
 ##do a loop here
-#k<-1
+k<-1
 
 for(k in 1:length(cooc)){
     
-    #print(paste("mat: ",k))
+    print(paste("mat: ",k))
     
     mat<-as.matrix(cooc[[k]])
     
@@ -278,7 +276,18 @@ for(k in 1:length(cooc)){
     
     #get the title and position k
     clusters<-read.csv(file=cfile,header=T,sep="")
+    ##
+    colnames(clusters)[2]<-"count"
+    clustersVector<-as.data.frame(c(1:length(clusters[,1])))
+    colnames(clustersVector)[1]<-"clusters"
+  
+    for(i in 1:length(clusters[,1])){
+      n<-clusters[i,2]
+      n<-sub(";","",n)
+      clustersVector[i,1]<-n
+    }
     
+    ##
     n <- nrow(unique(clusters))
     
     qual_col_pals = brewer.pal.info[brewer.pal.info$category == 'qual',]
@@ -286,7 +295,11 @@ for(k in 1:length(cooc)){
     col_vector = unlist(mapply(brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals)))
     colcodes <- sample(col_vector, n, replace = T)
     
+    clusters<-clustersVector
+    
     colframe <- data.frame(terms=rownames(mat),clusters=clusters)
+    
+    colframe$clusters<-as.numeric(colframe$clusters)
     colframe$colcode <- colcodes[colframe$clusters]
     
     grid.col <- setNames(colframe$colcode, colframe$terms)
