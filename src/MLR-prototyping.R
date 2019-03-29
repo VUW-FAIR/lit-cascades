@@ -18,6 +18,7 @@ plot_cex_axis = 0.3
 #data
 library(tidyverse)
 library(gridExtra)
+library(smacof)
 
 setwd("/Users/mlr/OneDrive - Victoria University of Wellington - STAFF/Git/tic-personality-words/outputs save/pda500-1000words-advs-lemma-book-centric/")
 
@@ -75,6 +76,8 @@ for(thresh in thresholds){
   for (sent in cooc) {
     index <- index + 1
     ## cluster text
+    #sent[lower.tri(sent)] <- 0
+    #Mydissimilarity_10values_r <- smacof::sim2diss(cor(cooc[[1]]), method = "rank", to.dist = T)
     test <- Rtsne::Rtsne(sent,check_duplicates=FALSE,
                          pca=TRUE, perplexity = max(1,floor(nrow(sent)/3)-1), 
                          theta=0, dims=2)
@@ -317,6 +320,55 @@ for(thresh in thresholds){
     ggplot2::ggsave(paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"_node_traits_1710.jpg"),plot=plo,device="jpeg")
     
     
+    
+    
+    ###MDS on traits
+    if(thresh < 0.1){
+      sent[lower.tri(sent)] <- 0
+      
+      wordTrait <- read.table("../../resources/pda500-trait-matches.csv",sep=",",header = T)
+      wordTrait$Term<-tolower(wordTrait$Term)
+      
+      traitCo <- matrix(nrow=5,ncol=5,data = 0)
+      rownames(traitCo)<-c("A","C","E","N","O")
+      colnames(traitCo)<-c("A","C","E","N","O")
+      
+      for(i in 1:nrow(sent)){
+        for(j in 1:nrow(sent)){
+          rowTerm <- as.character(wordTrait$Primary[which(wordTrait$Term==rownames(sent)[i])][1])
+          colTerm <- as.character(wordTrait$Primary[which(wordTrait$Term==colnames(sent)[j])][1])
+          crossVal <- sent[i,j]
+          if(rowTerm!=colTerm & (!is.na(rowTerm) & !is.na(colTerm)) & (rowTerm != "-" & colTerm != "-")){
+            traitCo[rowTerm,colTerm] <- traitCo[rowTerm,colTerm] + crossVal
+            traitCo[colTerm,rowTerm] <- traitCo[colTerm,rowTerm] + crossVal
+          }
+        }
+      }
+      
+      Mydissimilarity_10values_r <- smacof::sim2diss(cor(traitCo), method = "rank", to.dist = T)
+      MDS_ordinal_10values_r <- mds(Mydissimilarity_10values_r, type="ordinal")
+      png(filename=paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"_MDS_traits_rank_shepard.png"))
+      plot(MDS_ordinal_10values_r, plot.type = "Shepard", main="Ordinal")
+      text(55,.02, paste("Stress =", round(MDS_ordinal_10values_r$stress,2)))
+      dev.off()
+      MDSmod_10values_r <- mds(Mydissimilarity_10values_r, ndim = 2, type = c("ordinal"))
+      MDSmod_10values_r$stress
+      png(filename=paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"_MDS_traits_rank.png"))
+      plot(MDSmod_10values_r, main = "1710 // Rank", xlab = "Dimension 1", ylab = "Dimension 2")
+      dev.off()
+      
+      Mydissimilarity_10values_c <- sim2diss(cor(traitCo), method = "corr", to.dist = T)
+      MDS_ordinal_10values_c <- mds(Mydissimilarity_10values_c, type="ordinal")
+      png(filename=paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"_MDS_traits_corr_shepard.png"))
+      plot(MDS_ordinal_10values_c, plot.type = "Shepard", main="Ordinal")
+      text(55,.02, paste("Stress =", round(MDS_ordinal_10values_c$stress,2)))
+      dev.off()
+      MDSmod_10values_c <- mds(Mydissimilarity_10values_c, ndim = 2, type = c("ordinal"))
+      MDSmod_10values_c$stress
+      png(filename=paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"_MDS_traits_corr.png"))
+      plot(MDSmod_10values_c, main = "1710 // Correlation", xlab = "Dimension 1", ylab = "Dimension 2")
+      dev.off()
+    }
   }
 }
 
@@ -376,6 +428,7 @@ for(thresh in thresholds){
   for (sent in cooc) {
     index <- index + 1
     ## cluster text
+    #sent[lower.tri(sent)] <- 0
     test <- Rtsne::Rtsne(sent,check_duplicates=FALSE,
                          pca=TRUE, perplexity = max(1,floor(nrow(sent)/3)-1), 
                          theta=0, dims=2)
@@ -634,6 +687,64 @@ for(thresh in thresholds){
     #ts2_rate <- log(ts2 / stats::lag(ts2))
     #ts2_rate <- diff(ts2)
     #lmtest::grangertest(ts1_rate ~ ts2_rate, order = 1)
+    
+    
+    ###MDS on traits
+    if(thresh < 0.1){
+      sent[lower.tri(sent)] <- 0
+      
+      wordTrait <- read.table("../../resources/pda1710_no_abbreviation_loadings_categories.csv",sep=",",header = T)
+      wordTrait$Word<-tolower(wordTrait$Word)
+      
+      #add the max trait variable without loading threshold
+      wordTrait$maxValTrait <- ""
+      wordTrait$thresholdValTrait <- ""
+      for(i in 1:nrow(wordTrait)){
+        wordTrait$maxValTrait[i] <- names(which.max(abs(wordTrait[i,5:9])))
+        wordTrait$thresholdValTrait[i] <- ifelse(length(which(abs(wordTrait[i,5:9])>.25))>0,names(which.max(abs(wordTrait[i,5:9]))),"")
+      }
+      
+      traitCo <- matrix(nrow=5,ncol=5,data = 0)
+      rownames(traitCo)<-c("A","C","E","N","O")
+      colnames(traitCo)<-c("A","C","E","N","O")
+      
+      for(i in 1:nrow(sent)){
+        for(j in 1:nrow(sent)){
+          rowTerm <- as.character(wordTrait$thresholdValTrait[which(wordTrait$Word==rownames(sent)[i])][1])
+          colTerm <- as.character(wordTrait$thresholdValTrait[which(wordTrait$Word==colnames(sent)[j])][1])
+          crossVal <- sent[i,j]
+          if(rowTerm!=colTerm & (!is.na(rowTerm) & !is.na(colTerm)) & (rowTerm != "" & colTerm != "")){
+            traitCo[rowTerm,colTerm] <- traitCo[rowTerm,colTerm] + crossVal
+            traitCo[colTerm,rowTerm] <- traitCo[colTerm,rowTerm] + crossVal
+          }
+        }
+      }
+      
+      Mydissimilarity_10values_r <- smacof::sim2diss(cor(traitCo), method = "rank", to.dist = T)
+      MDS_ordinal_10values_r <- mds(Mydissimilarity_10values_r, type="ordinal")
+      png(filename=paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"_MDS_traits_rank_shepard.png"))
+      plot(MDS_ordinal_10values_r, plot.type = "Shepard", main="Ordinal")
+      text(55,.02, paste("Stress =", round(MDS_ordinal_10values_r$stress,2)))
+      dev.off()
+      MDSmod_10values_r <- mds(Mydissimilarity_10values_r, ndim = 2, type = c("ordinal"))
+      MDSmod_10values_r$stress
+      png(filename=paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"_MDS_traits_rank.png"))
+      plot(MDSmod_10values_r, main = "1710 // Rank", xlab = "Dimension 1", ylab = "Dimension 2")
+      dev.off()
+      
+      Mydissimilarity_10values_c <- sim2diss(cor(traitCo), method = "corr", to.dist = T)
+      MDS_ordinal_10values_c <- mds(Mydissimilarity_10values_c, type="ordinal")
+      png(filename=paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"_MDS_traits_corr_shepard.png"))
+      plot(MDS_ordinal_10values_c, plot.type = "Shepard", main="Ordinal")
+      text(55,.02, paste("Stress =", round(MDS_ordinal_10values_c$stress,2)))
+      dev.off()
+      MDSmod_10values_c <- mds(Mydissimilarity_10values_c, ndim = 2, type = c("ordinal"))
+      MDSmod_10values_c$stress
+      png(filename=paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"_MDS_traits_corr.png"))
+      plot(MDSmod_10values_c, main = "1710 // Correlation", xlab = "Dimension 1", ylab = "Dimension 2")
+      dev.off()
+    }
+    
   }
 }
 
@@ -695,6 +806,7 @@ for(thresh in thresholds){
   for (sent in cooc) {
     index <- index + 1
     ## cluster text
+    #sent[lower.tri(sent)] <- 0
     test <- Rtsne::Rtsne(sent,check_duplicates=FALSE,
                          pca=TRUE, perplexity = max(1,floor(nrow(sent)/3)-1), 
                          theta=0, dims=2)
@@ -944,12 +1056,104 @@ for(thresh in thresholds){
       geom_line(linetype = "dotted") +
       ggtitle(gsub("\\_links\\.csv","",alllinks[[index]]))
     ggplot2::ggsave(paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"_node_traits_500.jpg"),plot=plo,device="jpeg")
+    
+    
+    
+    ###MDS on traits
+    
+    if(thresh < 0.1){
+      sent[lower.tri(sent)] <- 0
+      
+      wordTrait <- read.table("../../resources/pda1710_no_abbreviation_loadings_categories.csv",sep=",",header = T)
+      wordTrait$Word<-tolower(wordTrait$Word)
+      
+      #add the max trait variable without loading threshold
+      wordTrait$maxValTrait <- ""
+      wordTrait$thresholdValTrait <- ""
+      for(i in 1:nrow(wordTrait)){
+        wordTrait$maxValTrait[i] <- names(which.max(abs(wordTrait[i,5:9])))
+        wordTrait$thresholdValTrait[i] <- ifelse(length(which(abs(wordTrait[i,5:9])>.25))>0,names(which.max(abs(wordTrait[i,5:9]))),"")
+      }
+      
+      traitCo <- matrix(nrow=5,ncol=5,data = 0)
+      rownames(traitCo)<-c("A","C","E","N","O")
+      colnames(traitCo)<-c("A","C","E","N","O")
+      
+      for(i in 1:nrow(sent)){
+        for(j in 1:nrow(sent)){
+          rowTerm <- as.character(wordTrait$thresholdValTrait[which(wordTrait$Word==rownames(sent)[i])][1])
+          colTerm <- as.character(wordTrait$thresholdValTrait[which(wordTrait$Word==colnames(sent)[j])][1])
+          crossVal <- sent[i,j]
+          if(rowTerm!=colTerm & (!is.na(rowTerm) & !is.na(colTerm)) & (rowTerm != "" & colTerm != "")){
+            traitCo[rowTerm,colTerm] <- traitCo[rowTerm,colTerm] + crossVal
+            traitCo[colTerm,rowTerm] <- traitCo[colTerm,rowTerm] + crossVal
+          }
+        }
+      }
+      
+      
+      
+      Mydissimilarity_10values_r <- smacof::sim2diss(cor(traitCo), method = "rank", to.dist = T)
+      MDS_ordinal_10values_r <- mds(Mydissimilarity_10values_r, type="ordinal")
+      png(filename=paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"_MDS_traits_rank_shepard.png"))
+      plot(MDS_ordinal_10values_r, plot.type = "Shepard", main="Ordinal")
+      text(55,.02, paste("Stress =", round(MDS_ordinal_10values_r$stress,2)))
+      dev.off()
+      MDSmod_10values_r <- mds(Mydissimilarity_10values_r, ndim = 2, type = c("ordinal"))
+      MDSmod_10values_r$stress
+      png(filename=paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"_MDS_traits_rank.png"))
+      plot(MDSmod_10values_r, main = "1710 // Rank", xlab = "Dimension 1", ylab = "Dimension 2")
+      dev.off()
+      
+      Mydissimilarity_10values_c <- sim2diss(cor(traitCo), method = "corr", to.dist = T)
+      MDS_ordinal_10values_c <- mds(Mydissimilarity_10values_c, type="ordinal")
+      png(filename=paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"_MDS_traits_corr_shepard.png"))
+      plot(MDS_ordinal_10values_c, plot.type = "Shepard", main="Ordinal")
+      text(55,.02, paste("Stress =", round(MDS_ordinal_10values_c$stress,2)))
+      dev.off()
+      MDSmod_10values_c <- mds(Mydissimilarity_10values_c, ndim = 2, type = c("ordinal"))
+      MDSmod_10values_c$stress
+      png(filename=paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"_MDS_traits_corr.png"))
+      plot(MDSmod_10values_c, main = "1710 // Correlation", xlab = "Dimension 1", ylab = "Dimension 2")
+      dev.off()
+    }
   }
 }
 
-### recurrence
-lnk <- link[[23]]
-nod <- node[[23]]
+####
+####
+#### trait conversion of co-occurrence matrix
+
+
+setwd("/Users/mlr/OneDrive - Victoria University of Wellington - STAFF/Git/tic-personality-words/outputs save/pda1710-1000words-advs-lemma-book-centric/")
+
+## Creating a list with all co-ocurrence matrices for all outputs
+allmatrices <- list.files(paste0("."),
+                          pattern = "(.*)_network_matrix.csv",
+                          full.names = T)
+
+alllinks <- list.files(paste0("."),
+                       pattern = "(.*)_links.csv",
+                       full.names = T)
+
+allnodes <- list.files(paste0("."),
+                       pattern = "(.*)_nodes.csv",
+                       full.names = T)
+
+## Fetching the data of the co-ocurrence matrices
+cooc <- lapply(allmatrices, function(x) read.table(x, header = T, check.names = F))
+link <- lapply(alllinks, function(x) read.table(x, header = T, check.names = F,
+                                                stringsAsFactors = F))
+node <- lapply(allnodes, function(x) read.table(x, header = T, check.names = F,
+                                                stringsAsFactors = F))
+
+for(bb in 1:length(cooc)){
+  rownames(cooc[[bb]]) <- cooc[[bb]][,1]
+  cooc[[bb]][,1] <- NULL
+}
+
+cooc[[1]][lower.tri(cooc[[1]])] <- 0
+
 wordTrait <- read.table("../../resources/pda1710_no_abbreviation_loadings_categories.csv",sep=",",header = T)
 wordTrait$Word<-tolower(wordTrait$Word)
 
@@ -961,3 +1165,35 @@ for(i in 1:nrow(wordTrait)){
   wordTrait$thresholdValTrait[i] <- ifelse(length(which(abs(wordTrait[i,5:9])>.25))>0,names(which.max(abs(wordTrait[i,5:9]))),"")
 }
 
+traitCo <- matrix(nrow=5,ncol=5,data = 0)
+rownames(traitCo)<-c("A","C","E","N","O")
+colnames(traitCo)<-c("A","C","E","N","O")
+
+for(i in 1:nrow(cooc[[1]])){
+  for(j in 1:nrow(cooc[[1]])){
+    rowTerm <- wordTrait$thresholdValTrait[which(wordTrait$Word==rownames(cooc[[1]])[i])][1]
+    colTerm <- wordTrait$thresholdValTrait[which(wordTrait$Word==colnames(cooc[[1]])[j])][1]
+    crossVal <- cooc[[1]][i,j]
+    if(rowTerm!=colTerm & (!is.na(rowTerm) & !is.na(colTerm)) & (rowTerm != "" & colTerm != "")){
+      traitCo[rowTerm,colTerm] <- traitCo[rowTerm,colTerm] + crossVal
+      traitCo[colTerm,rowTerm] <- traitCo[colTerm,rowTerm] + crossVal
+    }
+  }
+}
+
+Mydissimilarity_10values_r <- smacof::sim2diss(cor(traitCo), method = "rank", to.dist = T)
+MDS_ordinal_10values_r <- mds(Mydissimilarity_10values_r, type="ordinal")
+plot(MDS_ordinal_10values_r, plot.type = "Shepard", main="Ordinal")
+text(55,.02, paste("Stress =", round(MDS_ordinal_10values_r$stress,2)))
+MDSmod_10values_r <- mds(Mydissimilarity_10values_r, ndim = 2, type = c("ordinal"))
+MDSmod_10values_r$stress
+plot(MDSmod_10values_r, main = "COCA: MDS 10 values // Rank", xlab = "Dimension 1", ylab = "Dimension 2")
+
+
+Mydissimilarity_10values_c <- sim2diss(cor(traitCo), method = "corr", to.dist = T)
+MDS_ordinal_10values_c <- mds(Mydissimilarity_10values_c, type="ordinal")
+plot(MDS_ordinal_10values_c, plot.type = "Shepard", main="Ordinal")
+text(55,.02, paste("Stress =", round(MDS_ordinal_10values_c$stress,2)))
+MDSmod_10values_c <- mds(Mydissimilarity_10values_c, ndim = 2, type = c("ordinal"))
+MDSmod_10values_c$stress
+plot(MDSmod_10values_c, main = "COCA: MDS 10 values // Correlation", xlab = "Dimension 1", ylab = "Dimension 2")

@@ -1,7 +1,7 @@
 "terms";"clusters"
 "active";2
 "careful";2
-"careless";1
+"careless";2
 "cautious";2
 "certain";1
 "charitable";2
@@ -13,7 +13,7 @@
 "decided";2
 "determined";1
 "domestic";1
-"eager";1
+"eager";2
 "easy";1
 "exact";2
 "fresh";2
@@ -24,7 +24,7 @@
 "handsome";1
 "hopeless";2
 "impatient";2
-"indifferent";1
+"indifferent";2
 "intimate";1
 "jealous";2
 "kind";1
@@ -39,7 +39,7 @@
 "quick";2
 "quiet";2
 "reasonable";2
-"sad";1
+"sad";2
 "second";1
 "selfish";2
 "sensible";1
@@ -55,7 +55,7 @@
 "sure";1
 "suspicious";2
 "sweet";2
-"true";1
+"true";2
 "uncertain";2
 "vain";2
 "unhappy";2
