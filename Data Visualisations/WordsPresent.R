@@ -463,13 +463,13 @@ ggsave(filename=paste0(paste0("../",DIRECTORY,"/","PostProc","/"),
 
 
 #change TITLE for the  title of your plot
-TITLE<-"WordsPresent_frequencyOrdered_gridplot_allbooks"
+TITLE<-"WordsPresent_frequencyOrdered_gridplot_dickens"
 
 #change PLOT to the dataframe you want to plot
-PLOT<-ordered
+PLOT<-ordered.dickens
 
 #find highest frequency from ordered dataframe
-maximum<- max(ordered[1,3:length(ordered)]) #frequency **change to the correct 'ORDERED' file
+maximum<- max(ordered.dickens[1,3:length(ordered.dickens)]) #frequency **change to the correct 'ORDERED' file
 #maximum<-1 #binary
 
 #create plot - make changes** within for loop for the correct plot you want to make
