@@ -5,7 +5,7 @@
 begPath<-"/Users/GraceC/projects/TIC-VUW" #<- example
 setwd(paste0("/tic-personality-words/outputs save"))
 setwd("outputs save")
-DIRECTORY<-"pda500-sentence-advs-lemma-book-centric" #**
+DIRECTORY<-"pda500-1000words-advs-lemma-book-centric" #**
 setwd(DIRECTORY)
 getwd()
 setwd("..")
@@ -22,7 +22,7 @@ nodescsv <- list(dir(pattern = "*nodes.csv"))
 TXTFILE<-"pda500.txt" #**
 
 #Prep wordlist(TXTFILE):
-wordlist<-read.csv(file=TXTFILE, header=T, sep="\t")
+wordlist<-read.csv(file=TXTFILE, header=F, sep="\t")
 wordlist<-tolower(as.vector(wordlist[,1]))
 wordlist<-unique(wordlist)
 wordlist<-sort(wordlist)
@@ -201,12 +201,15 @@ WordsPresentFrequency<-function(WORDLIST){
 
 #MAIN:
 
+library(dplyr)
+
+
 #Prepping the data:
 
 #Setting directory
 setwd(paste0("tic-personality-words/outputs save"))
 setwd("TIC-VUW/tic-personality-words/outputs save")
-DIRECTORY<-"pda1710-sentence-advs-lemma-book-centric" #**
+DIRECTORY<-"pda1710-1000words-advs-lemma-book-centric" #**
 setwd(DIRECTORY)
 getwd()
 setwd("..")
@@ -218,19 +221,19 @@ nodescsv <- list(dir(pattern = "*nodes.csv"))
 
 #PREP WORDLIST (that could be found in each book):
 #Note: TXTFILE needs to be in the same directory as DIRECTORY
-TXTFILE<-"pda1710.txt" #**
+TXTFILE<-"pda1710_no_abbreviation.csv" #**
 #Set word list to compare with:
-wordlist<-read.csv(file=TXTFILE, header=T, sep="\t")
+wordlist<-read.csv(file=TXTFILE, header=F, sep="\t")
 wordlist<-tolower(as.vector(wordlist[,1]))
 wordlist<-unique(wordlist)
 wordlist<-sort(wordlist)
 
 length(wordlist)
 
-## For pda1710:
-#prep wordlist
-wordlist <- wordlist[-(372)] ## need to remove "extraction method: principal component analysis." from wordlist
-length(wordlist)
+# ## For pda1710:
+# #prep wordlist
+# wordlist <- wordlist[-(372)] ## need to remove "extraction method: principal component analysis." from wordlist
+# length(wordlist)
 
 WORDLIST<- wordlist#**
 
@@ -421,7 +424,7 @@ TITLE<-"WordsPresent_binary_gridplot_allbooks"
 #ordered.dickens
 
 #**
-#maximum<- max(ordered.dickens[1,3:length(ordered.dickens)]) #frequency
+#maximum<- max(ordered.dickens[1,3:length(ordered.dickens)]) #frequency **change to the correct 'ORDERED' file
 maximum<-1 #binary
 
 #change PLOT to the dataframe you want to plot#**
@@ -458,14 +461,15 @@ ggsave(filename=paste0(paste0("../",DIRECTORY,"/","PostProc","/"),
 #dickens
 #ordered.dickens
 
-#change PLOT to the dataframe you want to plot
-PLOT<-ordered.dickens
 
 #change TITLE for the  title of your plot
-TITLE<-"WordsPresent_frequencyOrdered_gridplot_dickens"
+TITLE<-"WordsPresent_frequencyOrdered_gridplot_allbooks"
+
+#change PLOT to the dataframe you want to plot
+PLOT<-ordered
 
 #find highest frequency from ordered dataframe
-maximum<- max(ordered.dickens[1,3:length(ordered.dickens)]) #frequency
+maximum<- max(ordered[1,3:length(ordered)]) #frequency **change to the correct 'ORDERED' file
 #maximum<-1 #binary
 
 #create plot - make changes** within for loop for the correct plot you want to make

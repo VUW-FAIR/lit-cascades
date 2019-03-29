@@ -4,7 +4,8 @@
 
 #PREP THE MATRICES
 setwd("/home/STAFF/cabauagr/projects/tic-personality-words/")
-DIRECTORY<-"pda1710-1000words-advs-lemma-book-centric"
+#FOLDER<-"0.1" #**
+DIRECTORY<-"pda1710-1000words-advs-lemma-book-centric/FOLDER" #** <--change 0.1 or 0.15
 getwd()
 setwd("..")
 
