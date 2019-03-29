@@ -4,13 +4,12 @@
 
 #PREP THE MATRICES
 setwd("/home/STAFF/cabauagr/projects/tic-personality-words/")
-#FOLDER<-"0.1" #**
-DIRECTORY<-"pda1710-1000words-advs-lemma-book-centric/FOLDER" #** <--change 0.1 or 0.15
+D<-"pda500-1000words-advs-lemma-book-centric"
 getwd()
 setwd("..")
 
 ## Creating a list with all co-ocurrence matrices for all outputs
-allmatrices <- list.files(paste0("outputs save/",DIRECTORY),
+allmatrices <- list.files(paste0("outputs save/",D),
 pattern = "(.*)_network_matrix.csv",
 full.names = T)
 
@@ -20,18 +19,19 @@ for(bb in 1:length(cooc)){
     rownames(cooc[[bb]]) <- cooc[[bb]][,1]
     cooc[[bb]][,1] <- NULL
     
-    # # rare co-occurring terms
-    # rareT <- which(rowSums(cooc[[bb]]) <= ceiling(max(rowSums(cooc[[bb]])) * .15))
-    # # frequent co-occ terms
-    # freqT <- which(rowSums(cooc[[bb]]) > ceiling(max(rowSums(cooc[[bb]])) * .15))
-    # # rare terms only co-occurring with rare terms
-    # finalRare <- which(colSums(cooc[[bb]][freqT,]) == 0)
-    #
-    # cooc[[bb]] <- cooc[[bb]][-finalRare,-finalRare]
-    #
-    # if(length(which(rowSums(cooc[[bb]])==0)) > 0){
-    #   cooc[[bb]] <- cooc[[bb]][-(which(rowSums(cooc[[bb]])==0)),-(which(rowSums(cooc[[bb]])==0))]
-}
+     # # rare co-occurring terms
+     # rareT <- which(rowSums(cooc[[bb]]) <= ceiling(max(rowSums(cooc[[bb]])) * .15))
+     # # frequent co-occ terms
+     # freqT <- which(rowSums(cooc[[bb]]) > ceiling(max(rowSums(cooc[[bb]])) * .15))
+     # # rare terms only co-occurring with rare terms
+     # finalRare <- which(colSums(cooc[[bb]][freqT,]) == 0)
+     # 
+     # cooc[[bb]] <- cooc[[bb]][-finalRare,-finalRare]
+     # 
+     # if(length(which(rowSums(cooc[[bb]])==0)) > 0){
+     #   cooc[[bb]] <- cooc[[bb]][-(which(rowSums(cooc[[bb]])==0)),-(which(rowSums(cooc[[bb]])==0))]
+     # }
+}     
 
 
 ##
@@ -83,6 +83,7 @@ library(RColorBrewer)
 
 #Setting directory
 setwd("outputs save")
+DIRECTORY<-"pda500-1000words-advs-lemma-book-centric/0.1" #** <--change 0.1 or 0.15
 setwd(DIRECTORY)
 getwd()
 setwd("..") #if you would like to go back one directory
@@ -94,9 +95,9 @@ clusterscsv <- list(dir(pattern = "*-TSNE-cluster.csv"))
 
 
 ##do a loop here
-k<-2
+k<-1
 
-for(k in 22:length(cooc)){
+for(k in 1:length(cooc)){
     
     print(paste("mat: ",k))
     
