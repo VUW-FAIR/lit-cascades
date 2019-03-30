@@ -370,7 +370,7 @@ allnodes <- list.files(paste0("."),
                        pattern = "(.*)_nodes.csv",
                        full.names = T)
 
-thresholds <- c(0,0.05,0.1,0.15,0.25)
+thresholds <- list(0,0.05,0.1,0.15,0.25,-0.8,-0.6,-0.4,-0.2)
 
 for(thresh in thresholds){
   if (!file.exists(as.character(thresh))){
@@ -387,10 +387,26 @@ for(thresh in thresholds){
   for(bb in 1:length(cooc)){
     rownames(cooc[[bb]]) <- cooc[[bb]][,1]
     cooc[[bb]][,1] <- NULL
-    rareT <- which(rowSums(cooc[[bb]]) <= ceiling(max(rowSums(cooc[[bb]])) * thresh))
-    freqT <- which(rowSums(cooc[[bb]]) > ceiling(max(rowSums(cooc[[bb]])) * thresh))
-    if(length(rareT)>0){
-      cooc[[bb]] <- cooc[[bb]][-rareT,-rareT]
+    if(thresh > 0){
+      # rare co-occurring terms
+      rareT <- which(rowSums(cooc[[bb]]) <= ceiling(max(rowSums(cooc[[bb]])) * thresh))
+      # frequent co-occ terms
+      freqT <- which(rowSums(cooc[[bb]]) > ceiling(max(rowSums(cooc[[bb]])) * thresh))
+      # rare terms only co-occurring with rare terms
+      #finalRare <- which(colSums(cooc[[bb]][freqT,]) == 0)
+      if(length(rareT)>0){
+        cooc[[bb]] <- cooc[[bb]][-rareT,-rareT]
+      }
+    } else if(thresh < 0){
+      # rare co-occurring terms
+      rareT <- which(rowSums(cooc[[bb]]) <= ceiling(max(rowSums(cooc[[bb]])) * (-1 * thresh)))
+      # frequent co-occ terms
+      freqT <- which(rowSums(cooc[[bb]]) > ceiling(max(rowSums(cooc[[bb]])) * (-1 * thresh)))
+      # rare terms only co-occurring with rare terms
+      #finalRare <- which(colSums(cooc[[bb]][freqT,]) == 0)
+      if(length(rareT)>0){
+        cooc[[bb]] <- cooc[[bb]][rareT,rareT]
+      }
     }
   }
   
@@ -406,6 +422,88 @@ for(thresh in thresholds){
     test <- Rtsne::Rtsne(sent,check_duplicates=FALSE,
                          pca=TRUE, perplexity = max(1,floor(nrow(sent)/3)-1), 
                          theta=0, dims=2)
+    
+    ## factor andlysis
+    #if(thresh==0){
+    tryCatch({
+      loadings2 <- NULL
+      loadings2 <- psych::fa(cor(sent),nfactors = 2,fm="minres",rotate = "varimax")
+      write.table(loadings2$loadings,paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"-2factors.csv"),sep = ";")
+    }, warning = function(warning_condition) {
+      loadings2 <- psych::fa(cor(sent),nfactors = 2,fm="minres",rotate = "varimax")
+      write.table(loadings2$loadings,paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"-2factors.csv"),sep = ";")
+    }, error = function(error_condition) {}, finally={rm(loadings2)})
+    tryCatch({
+      loadings3 <- NULL
+      loadings3 <- psych::fa(cor(sent),nfactors = 3,fm="minres",rotate = "varimax")
+      write.table(loadings3$loadings,paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"-3factors.csv"),sep = ";")
+    }, warning = function(warning_condition) {
+      loadings3 <- psych::fa(cor(sent),nfactors = 3,fm="minres",rotate = "varimax")
+      write.table(loadings3$loadings,paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"-3factors.csv"),sep = ";")
+    }, error = function(error_condition) {}, finally={rm(loadings3)})
+    tryCatch({
+      loadings4 <- NULL
+      loadings4 <- psych::fa(cor(sent),nfactors = 4,fm="minres",rotate = "varimax")
+      write.table(loadings4$loadings,paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"-4factors.csv"),sep = ";")
+    }, warning = function(warning_condition) {
+      loadings4 <- psych::fa(cor(sent),nfactors = 4,fm="minres",rotate = "varimax")
+      write.table(loadings4$loadings,paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"-4factors.csv"),sep = ";")
+    }, error = function(error_condition) {}, finally={rm(loadings4)})
+    tryCatch({
+      loadings5 <- NULL
+      loadings5 <- psych::fa(cor(sent),nfactors = 5,fm="minres",rotate = "varimax")
+      write.table(loadings5$loadings,paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"-5factors.csv"),sep = ";")
+    }, warning = function(warning_condition) {
+      loadings5 <- psych::fa(cor(sent),nfactors = 5,fm="minres",rotate = "varimax")
+      write.table(loadings5$loadings,paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"-5factors.csv"),sep = ";")
+    }, error = function(error_condition) {}, finally={rm(loadings5)})
+    
+    tryCatch({
+      loadings8 <- NULL
+      loadings8 <- psych::fa(cor(sent),nfactors = 8,fm="minres",rotate = "varimax")
+      write.table(loadings8$loadings,paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"-8factors.csv"),sep = ";")
+    }, warning = function(warning_condition) {
+      loadings8 <- psych::fa(cor(sent),nfactors = 8,fm="minres",rotate = "varimax")
+      write.table(loadings8$loadings,paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"-8factors.csv"),sep = ";")
+    }, error = function(error_condition) {}, finally={rm(loadings8)})
+    tryCatch({
+      loadings9 <- NULL
+      loadings9 <- psych::fa(cor(sent),nfactors = 9,fm="minres",rotate = "varimax")
+      write.table(loadings9$loadings,paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"-9factors.csv"),sep = ";")
+    }, warning = function(warning_condition) {
+      loadings9 <- psych::fa(cor(sent),nfactors = 9,fm="minres",rotate = "varimax")
+      write.table(loadings9$loadings,paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"-9factors.csv"),sep = ";")
+    }, error = function(error_condition) {}, finally={rm(loadings9)})
+    tryCatch({
+      loadings10 <- NULL
+      loadings10 <- psych::fa(cor(sent),nfactors = 10,fm="minres",rotate = "varimax")
+      write.table(loadings10$loadings,paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"-10factors.csv"),sep = ";")
+    }, warning = function(warning_condition) {
+      loadings10 <- psych::fa(cor(sent),nfactors = 10,fm="minres",rotate = "varimax")
+      write.table(loadings10$loadings,paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"-10factors.csv"),sep = ";")
+    }, error = function(error_condition) {}, finally={rm(loadings10)})  
+    tryCatch({
+      loadings11 <- NULL
+      loadings11 <- psych::fa(cor(sent),nfactors = 11,fm="minres",rotate = "varimax")
+      write.table(loadings11$loadings,paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"-11factors.csv"),sep = ";")
+    }, warning = function(warning_condition) {
+      loadings11 <- psych::fa(cor(sent),nfactors = 11,fm="minres",rotate = "varimax")
+      write.table(loadings11$loadings,paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"-11factors.csv"),sep = ";")
+    }, error = function(error_condition) {}, finally={rm(loadings11)})  
+    tryCatch({
+      loadings12 <- NULL
+      loadings12 <- psych::fa(cor(sent),nfactors = 12,fm="minres",rotate = "varimax")
+      write.table(loadings12$loadings,paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"-12factors.csv"),sep = ";")
+    }, warning = function(warning_condition) {
+      loadings12 <- psych::fa(cor(sent),nfactors = 12,fm="minres",rotate = "varimax")
+      write.table(loadings12$loadings,paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"-12factors.csv"),sep = ";")
+    }, error = function(error_condition) {}, finally={rm(loadings12)})
+    
+    
+    #loadings <- psych::fa.parallel(cor(cooc[[2]]),nfactors = 10, fm = "minres")
+    
+    
+    
     #withkmeans
     fit_cluster_kmeans <- fpc::kmeansruns(test$Y,krange=2:(nrow(sent)/2),critout=F,runs=5,criterion="ch")
     write.csv2(data.frame(terms=rownames(sent),clusters=fit_cluster_kmeans$cluster),paste0(thresh,"/",gsub("\\_links\\.csv","",alllinks[[index]]),"-TSNE-cluster.csv"), row.names = F, col.names = F, sep = ";")

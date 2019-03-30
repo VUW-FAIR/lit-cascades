@@ -14,10 +14,10 @@
 "curious";1
 "delicate";2
 "domestic";2
-"earnest";2
-"easy";1
+"earnest";1
+"easy";2
 "exact";2
-"expressive";2
+"expressive";1
 "faithful";1
 "familiar";2
 "free";1
@@ -33,7 +33,7 @@
 "hopeful";2
 "hopeless";1
 "humble";2
-"impatient";1
+"impatient";2
 "independent";2
 "indifferent";2
 "kind";1
@@ -48,7 +48,7 @@
 "polite";2
 "political";2
 "practical";1
-"proud";2
+"proud";1
 "quick";1
 "quiet";1
 "rapid";1
@@ -60,13 +60,13 @@
 "sentimental";2
 "serene";2
 "silent";1
-"simple";1
+"simple";2
 "slow";1
 "sober";2
 "social";2
 "stately";2
 "statistical";2
-"steady";1
+"steady";2
 "stern";2
 "stiff";2
 "strong";1

@@ -30,7 +30,7 @@ setwd("/Users/mlr/OneDrive - Victoria University of Wellington - STAFF/Git/tic-p
 
 #housekeeping and helpers
 options(scipen = 999)
-allwords <- FALSE
+allwords <- TRUE
 stemTrait <- FALSE
 # Functions ---------------------------------------------------------------
 
@@ -82,9 +82,9 @@ tic_generate <- function(inputsequence) {
 #get all text and char files
 allTextFiles <- list.files("resources/Text Files")
 
-for(sliceSize in list("sentence")){
+#for(sliceSize in list("sentence")){
 #for(sliceSize in list(1000)){
-#for(sliceSize in list(1000,"sentence")){
+for(sliceSize in list(1000,"sentence")){
   dir.create(file.path("resources/output/", sliceSize), showWarnings = FALSE)
   
   for(nextRun in 1:length(allTextFiles)){
@@ -143,12 +143,12 @@ for(sliceSize in list("sentence")){
     #character list
     # random word lists -> allwords <- TRUE
     #trait_words <- tolower(readLines('resources/random-500.txt'))
-    #trait_words <- tolower(readLines(paste0("resources/output/",theSource,"_random.csv")))
+    trait_words <- tolower(readLines(paste0("resources/output/",theSource,"_random.csv")))
     
     #trait_words <- gsub("\\s*", "", tolower(readLines('resources/Personal Traits.txt')))
     #trait_words <- tolower(readLines('resources/pda500.txt'))
     spacyr::spacy_initialize()
-    trait_words <- unique(tolower(readLines('resources/pda1710_no_abbreviation.csv')))
+    #trait_words <- unique(tolower(readLines('resources/pda1710_no_abbreviation.csv')))
     outer_lapply <- lapply(words300B, function(xx){
       result = tryCatch({
         
@@ -184,7 +184,7 @@ for(sliceSize in list("sentence")){
         } else{
           matched <- match(xx,trait_words)
           traitwords_out <- xx[which(!is.na(matched))]
-          traitwords_out_lem <- xx_lem[which(!is.na(matched))]
+          if(!allwords) {traitwords_out_lem <- xx_lem[which(!is.na(matched))]}
         }
         
         ## Replacing lemmatised word with token word to allow for matching of negative dependencies

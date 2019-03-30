@@ -2,8 +2,6 @@ library(tidyverse)
 
 library(gridExtra)
 
-setwd("/Users/mlr/OneDrive - Victoria University of Wellington - STAFF/Git/tic-personality-words/outputs save/allport-1000words-personal-traits-advs-lemma-book-centric/")
-
 # Function ----------------------------------------------------------------
 plot_cluster <- function(data, var_cluster, palette)  
 {
@@ -369,7 +367,7 @@ structuralFeatures <- function(book, nodes, links, cooc){
 }
 # Start of the Code -------------------------------------------------------
 
-
+setwd("/Users/mlr/OneDrive - Victoria University of Wellington - STAFF/Git/tic-personality-words/outputs save/random-from-book-sentence-all-words-book-centric/")
 ## Creating a list with all co-ocurrence matrices for all outputs
 allmatrices <- list.files(paste0("."),
                             pattern = "(.*)_network_matrix.csv",

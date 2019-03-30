@@ -1,0 +1,18 @@
+"afraid" "best" "cheerful" "comfortable" "delightful" "different" "fair" "greatest" "happy" "interesting" "natural" "pleasant" "quiet" "reasonable" "strong" "superior" "worth"
+"afraid" 0 11 7 6 11 13 7 8 28 7 9 7 7 3 5 12 7
+"best" 11 0 9 12 9 10 9 11 28 10 10 9 7 5 14 11 8
+"cheerful" 7 9 0 7 5 5 2 4 15 4 8 8 3 3 6 5 3
+"comfortable" 6 12 7 0 7 5 6 6 14 4 10 6 5 4 6 5 7
+"delightful" 11 9 5 7 0 6 4 5 20 6 6 6 7 3 6 11 5
+"different" 13 10 5 5 6 0 3 7 18 3 5 10 4 2 6 12 4
+"fair" 7 9 2 6 4 3 0 5 7 3 8 2 4 3 6 6 4
+"greatest" 8 11 4 6 5 7 5 0 13 6 9 6 4 4 6 4 6
+"happy" 28 28 15 14 20 18 7 13 0 15 20 17 14 7 14 20 11
+"interesting" 7 10 4 4 6 3 3 6 15 0 10 4 3 3 7 8 4
+"natural" 9 10 8 10 6 5 8 9 20 10 0 6 9 7 11 11 6
+"pleasant" 7 9 8 6 6 10 2 6 17 4 6 0 4 4 4 8 4
+"quiet" 7 7 3 5 7 4 4 4 14 3 9 4 0 4 9 3 5
+"reasonable" 3 5 3 4 3 2 3 4 7 3 7 4 4 0 5 5 3
+"strong" 5 14 6 6 6 6 6 6 14 7 11 4 9 5 0 7 6
+"superior" 12 11 5 5 11 12 6 4 20 8 11 8 3 5 7 0 3
+"worth" 7 8 3 7 5 4 4 6 11 4 6 4 5 3 6 3 0

@@ -1,6 +1,6 @@
 "terms";"clusters"
 "affectionate";1
-"agreeable";2
+"agreeable";1
 "amiable";1
 "anxious";2
 "awkward";1
@@ -8,7 +8,7 @@
 "bright";2
 "careful";1
 "certain";2
-"cheerful";1
+"cheerful";2
 "cold";2
 "constant";1
 "deep";2
@@ -22,8 +22,8 @@
 "harsh";1
 "hasty";1
 "hearty";1
-"honest";1
-"humble";2
+"honest";2
+"humble";1
 "impatient";1
 "jealous";1
 "kind";2
@@ -36,7 +36,7 @@
 "pleasant";2
 "profound";1
 "proper";1
-"proud";2
+"proud";1
 "quick";1
 "quiet";2
 "rough";1

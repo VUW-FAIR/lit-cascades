@@ -1,0 +1,15 @@
+"afraid" "beautiful" "best" "cruel" "curious" "dangerous" "fair" "free" "greatest" "happy" "natural" "quiet" "safe" "strong"
+"afraid" 0 2 6 1 1 1 1 1 0 1 1 2 1 7
+"beautiful" 2 0 6 0 2 1 3 3 1 4 2 3 2 7
+"best" 6 6 0 2 5 2 5 5 2 3 6 8 4 8
+"cruel" 1 0 2 0 1 1 0 3 3 2 0 4 1 3
+"curious" 1 2 5 1 0 1 3 1 0 0 2 2 1 6
+"dangerous" 1 1 2 1 1 0 2 3 1 4 2 4 5 4
+"fair" 1 3 5 0 3 2 0 2 2 2 4 1 4 3
+"free" 1 3 5 3 1 3 2 0 2 5 2 4 3 7
+"greatest" 0 1 2 3 0 1 2 2 0 3 1 0 3 6
+"happy" 1 4 3 2 0 4 2 5 3 0 3 6 2 7
+"natural" 1 2 6 0 2 2 4 2 1 3 0 1 5 7
+"quiet" 2 3 8 4 2 4 1 4 0 6 1 0 1 9
+"safe" 1 2 4 1 1 5 4 3 3 2 5 1 0 5
+"strong" 7 7 8 3 6 4 3 7 6 7 7 9 5 0

@@ -1,0 +1,15 @@
+"afraid" "best" "delighted" "famous" "free" "gentle" "greatest" "holy" "honest" "pleasant" "reasonable" "rich" "wise" "worth"
+"afraid" 0 1 0 1 0 1 0 1 1 0 1 0 1 1
+"best" 1 0 0 0 0 0 1 0 2 0 0 2 1 1
+"delighted" 0 0 0 2 0 0 1 0 0 1 0 2 1 0
+"famous" 1 0 2 0 0 1 1 1 0 1 1 2 2 0
+"free" 0 0 0 0 0 0 1 2 0 1 0 2 1 0
+"gentle" 1 0 0 1 0 0 0 1 1 0 1 1 1 0
+"greatest" 0 1 1 1 1 0 0 1 0 3 1 3 3 0
+"holy" 1 0 0 1 2 1 1 0 1 0 1 0 1 1
+"honest" 1 2 0 0 0 1 0 1 0 0 0 2 0 2
+"pleasant" 0 0 1 1 1 0 3 0 0 0 1 3 2 0
+"reasonable" 1 0 0 1 0 1 1 1 0 1 0 1 2 0
+"rich" 0 2 2 2 2 1 3 0 2 3 1 0 3 0
+"wise" 1 1 1 2 1 1 3 1 0 2 2 3 0 0
+"worth" 1 1 0 0 0 0 0 1 2 0 0 0 0 0
